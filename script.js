@@ -1,5 +1,5 @@
-var xScreenSize = innerWidth-5;
-var yScreenSize = innerHeight-4;
+var xScreenSize = innerWidth-20;
+var yScreenSize = innerHeight-20;
 
 function setup() {
   createCanvas(xScreenSize, yScreenSize);
