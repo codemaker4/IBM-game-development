@@ -6,6 +6,24 @@ function setup() {
   createCanvas(xScreenSize, yScreenSize);
 }
 
+function wall(X,Y) {
+  this.xPos = X;
+  this.yPos = Y;
+  this.health = 3;
+  // hitbox bullets
+  // render
+}
+
+function player() {
+  this.xPos = 0;
+  this.yPos = 0;
+  // controls
+  // hitboxing walls
+  // hitboxing bullets
+  // hitboxing enemys
+  // render
+}
+
 function draw() {
   if (stage == 0){
     background(0);
