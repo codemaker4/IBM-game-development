@@ -1,6 +1,7 @@
 var xScreenSize = innerWidth-20;
 var yScreenSize = innerHeight-20;
 var stage = 0
+var walls = [];
 
 function setup() {
   createCanvas(xScreenSize, yScreenSize);
@@ -13,7 +14,14 @@ function wall(X,Y) {
   this.health = 3;
   // hitbox bullets
   // render
+  this.render = function() {
+    rectMode(CENTER);
+    fill(255);
+    rect(this.xPos, this.yPos, 20, 20);
+  }
 }
+
+walls = [new wall(150,150),new wall(160,160)];
 
 function player() {
   this.xPos = 100;
@@ -21,6 +29,7 @@ function player() {
   this.xSpeed = 0;
   this.ySpeed = 0;
   this.direction = 0;
+  this.health = 100;
   // controls
   this.controls = function() {
     if (keyIsDown(65)) { //a
@@ -51,7 +60,8 @@ function player() {
     translate(this.xPos,this.yPos);
     push();
     rotate(this.direction);
-    rect(-5, -5, 10, 10);
+    rectMode(CENTER);
+    rect(0, 0, 10, 10);
     pop();
   }
 }
@@ -64,6 +74,11 @@ function draw() {
     fill(0, 255, 0);
     noStroke();
     Player.controls();
+    var a = 0;
+    while (a < walls.length) {
+      walls[a].render();
+      a += 1;
+    }
     Player.render();
   }
 }
