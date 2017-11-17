@@ -4,6 +4,7 @@ var stage = 0
 
 function setup() {
   createCanvas(xScreenSize, yScreenSize);
+  angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
 function wall(X,Y) {
@@ -19,19 +20,22 @@ function player() {
   this.yPos = 100;
   this.xSpeed = 0;
   this.ySpeed = 0;
+  this.direction = 0;
   // controls
   this.controls = function() {
     if (keyIsDown(65)) { //a
-      this.xSpeed -= 1;
+      this.direction -= 0.1;
     }
     if (keyIsDown(68)) { //d
-      this.xSpeed += 1;
+      this.direction += 0.1;
     }
     if (keyIsDown(87)) { //w
-      this.ySpeed -= 1;
+      this.xSpeed -= Math.sin(this.direction);
+      this.ySpeed += Math.cos(this.direction);
     }
     if (keyIsDown(83)) { //s
-      this.ySpeed += 1;
+      this.xSpeed += Math.sin(this.direction);
+      this.ySpeed -= Math.cos(this.direction);
     }
     this.xPos += this.xSpeed;
     this.yPos += this.ySpeed;
@@ -44,7 +48,11 @@ function player() {
   // render
   this.render = function() {
     fill(0,0,0); //color = black
-    ellipse(this.xPos,this.yPos,5,5)
+    translate(this.xPos,this.yPos);
+    push();
+    rotate(this.direction);
+    rect(-10, -10, 10, 10);
+    pop();
   }
 }
 
