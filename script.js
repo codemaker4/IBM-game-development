@@ -57,8 +57,8 @@ function player() {
       var dy = walls[a].yPos - this.yPos;
       if (Math.sqrt((dx*dx)+(dy*dy)) < (walls[a].size / 2) + 10) {
         this.health -= 5;
-        this.xSpeed -= dx / 10;
-        this.ySpeed -= dy / 10;
+        this.xSpeed = dx / -10;
+        this.ySpeed = dy / -10;
       }
       a += 1;
     }
