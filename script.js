@@ -51,7 +51,7 @@ function player() {
     translate(this.xPos,this.yPos);
     push();
     rotate(this.direction);
-    rect(-10, -10, 10, 10);
+    rect(-5, -5, 10, 10);
     pop();
   }
 }
