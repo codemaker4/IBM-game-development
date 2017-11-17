@@ -17,20 +17,26 @@ function wall(X,Y) {
 function player() {
   this.xPos = 100;
   this.yPos = 100;
+  this.xSpeed = 0;
+  this.ySpeed = 0;
   // controls
   this.controls = function() {
     if (keyIsDown(65)) { //a
-      this.xPos-=5;
+      this.xSpeed -= 1;
     }
     if (keyIsDown(68)) { //d
-      this.xPos+=5;
+      this.xSpeed += 1;
     }
     if (keyIsDown(87)) { //w
-      this.yPos-=5;
+      this.ySpeed -= 1;
     }
     if (keyIsDown(83)) { //s
-      this.yPos+=5;
+      this.ySpeed += 1;
     }
+    this.xPos += this.xSpeed;
+    this.yPos += this.ySpeed;
+    this.xSpeed = this.xSpeed * 0.9;
+    this.ySpeed = this.ySpeed * 0.9;
   }
   // hitboxing walls
   // hitboxing bullets
