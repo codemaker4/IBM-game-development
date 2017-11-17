@@ -3,6 +3,7 @@ var yScreenSize = innerHeight-20;
 var stage = 0;
 var walls = [];
 var player_img;
+var a = 0;
 
 function setup() {
   createCanvas(xScreenSize, yScreenSize);
@@ -10,20 +11,21 @@ function setup() {
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
-function wall(X,Y) {
+function wall(X,Y,size) {
   this.xPos = X;
   this.yPos = Y;
+  this.size = size;
   this.health = 3;
   // hitbox bullets
   // render
   this.render = function() {
     rectMode(CENTER);
     fill(255);
-    rect(this.xPos, this.yPos, 20, 20);
+    rect(this.xPos, this.yPos, size, size);
   }
 }
 
-walls = [new wall(150,150),new wall(160,160)];
+walls = [new wall(150,150,20),new wall(160,160,20)];
 
 function player() {
   this.xPos = 100;
@@ -48,12 +50,23 @@ function player() {
       this.xSpeed += Math.sin(this.direction);
       this.ySpeed -= Math.cos(this.direction);
     }
+    a = 0;
+    //hitboxing walls
+    while (a < walls.length) {
+      var dx = walls[a].xPos - this.xPos;
+      var dy = walls[a].yPos - this.yPos;
+      if (Math.sqrt((dx*dx)+(dy*dy)) < (walls[a].size / 2) + 10) {
+        this.health -= 5;
+        this.xSpeed -= dx / 10;
+        this.ySpeed -= dy / 10;
+      }
+      a += 1;
+    }
     this.xPos += this.xSpeed;
     this.yPos += this.ySpeed;
     this.xSpeed = this.xSpeed * 0.95;
     this.ySpeed = this.ySpeed * 0.95;
   }
-  // hitboxing walls
   // hitboxing bullets
   // hitboxing enemys
   // render
@@ -78,7 +91,7 @@ function draw() {
     fill(0, 255, 0);
     noStroke();
     Player.controls();
-    var a = 0;
+    a = 0;
     while (a < walls.length) {
       walls[a].render();
       a += 1;
