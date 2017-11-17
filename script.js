@@ -1,10 +1,12 @@
 var xScreenSize = innerWidth-20;
 var yScreenSize = innerHeight-20;
-var stage = 0
+var stage = 0;
 var walls = [];
+var player_img;
 
 function setup() {
   createCanvas(xScreenSize, yScreenSize);
+  player_img = loadImage("images/pon.png");
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
@@ -33,10 +35,10 @@ function player() {
   // controls
   this.controls = function() {
     if (keyIsDown(65)) { //a
-      this.direction -= 0.1;
+      this.direction -= 0.05;
     }
     if (keyIsDown(68)) { //d
-      this.direction += 0.1;
+      this.direction += 0.05;
     }
     if (keyIsDown(87)) { //w
       this.xSpeed -= Math.sin(this.direction);
@@ -48,8 +50,8 @@ function player() {
     }
     this.xPos += this.xSpeed;
     this.yPos += this.ySpeed;
-    this.xSpeed = this.xSpeed * 0.9;
-    this.ySpeed = this.ySpeed * 0.9;
+    this.xSpeed = this.xSpeed * 0.95;
+    this.ySpeed = this.ySpeed * 0.95;
   }
   // hitboxing walls
   // hitboxing bullets
@@ -62,6 +64,8 @@ function player() {
     rotate(this.direction);
     rectMode(CENTER);
     rect(0, 0, 10, 10);
+    stroke(255,0,0);
+    line(0,0,0,50);
     pop();
   }
 }
