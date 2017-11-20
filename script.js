@@ -3,11 +3,13 @@ var yScreenSize = innerHeight-20;
 var stage = 0;
 var walls = [];
 var player_img;
+var barricade_img;
 var a = 0;
 
 function setup() {
   createCanvas(xScreenSize, yScreenSize);
   player_img = loadImage("images/pon.png");
+  barricade_img = loadImage("images/barriecade.png");
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
@@ -21,7 +23,7 @@ function wall(X,Y,size) {
   this.render = function() {
     rectMode(CENTER);
     fill(255);
-    rect(this.xPos, this.yPos, size, size);
+    image(barricade_img, this.xPos, this.yPos, size, size);
   }
 }
 
@@ -55,7 +57,7 @@ function player() {
     while (a < walls.length) {
       var dx = walls[a].xPos - this.xPos;
       var dy = walls[a].yPos - this.yPos;
-      if (Math.sqrt((dx*dx)+(dy*dy)) < (walls[a].size / 2) + 10) {
+      if (Math.sqrt((dx*dx)+(dy*dy)) < (walls[a].size / 2) + 37.5) {
         this.health -= 5;
         this.xSpeed = dx / -10;
         this.ySpeed = dy / -10;
@@ -76,7 +78,7 @@ function player() {
     push();
     rotate(this.direction);
     rectMode(CENTER);
-    rect(0, 0, 10, 10);
+    image(player_img, -37.5, -37.5, 75, 75);
     stroke(255,0,0);
     line(0,0,0,50);
     pop();
