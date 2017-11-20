@@ -5,6 +5,8 @@ var walls = [];
 var player_img;
 var barricade_img;
 var a = 0;
+var dx = 0;
+var dy = 0;
 
 function setup() {
   createCanvas(xScreenSize, yScreenSize);
@@ -23,11 +25,11 @@ function wall(X,Y,size) {
   this.render = function() {
     rectMode(CENTER);
     fill(255);
-    image(barricade_img, this.xPos, this.yPos, size, size);
+    image(barricade_img, this.xPos - (size/2), this.yPos - (size/2), size, size);
   }
 }
 
-walls = [new wall(150,150,20),new wall(160,160,20)];
+walls = [new wall(150,150,20), new wall(160,160,20), new wall(170,160,20), new wall(180,160,20)];
 
 function player() {
   this.xPos = 100;
@@ -55,12 +57,12 @@ function player() {
     a = 0;
     //hitboxing walls
     while (a < walls.length) {
-      var dx = walls[a].xPos - this.xPos;
-      var dy = walls[a].yPos - this.yPos;
-      if (Math.sqrt((dx*dx)+(dy*dy)) < (walls[a].size / 2) + 37.5) {
+      dx = walls[a].xPos - this.xPos;
+      dy = walls[a].yPos - this.yPos;
+      if (Math.sqrt((dx*dx)+(dy*dy)) < ((10) + (70/3))) {
         this.health -= 5;
-        this.xSpeed = dx / -10;
-        this.ySpeed = dy / -10;
+        this.xSpeed += dx / -50;
+        this.ySpeed += dy / -50;
       }
       a += 1;
     }
@@ -87,6 +89,8 @@ function player() {
 
 var Player = new player();
 
+var count = 0;
+
 function draw() {
   if (stage == 0){
     background(100);
@@ -100,4 +104,5 @@ function draw() {
     }
     Player.render();
   }
+  count += 1;
 }
