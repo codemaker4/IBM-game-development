@@ -31,28 +31,50 @@ function wall(X,Y,size) {
 
 walls = [new wall(150,150,20), new wall(160,160,20), new wall(170,160,20), new wall(180,160,20)];
 
+function bullet(X,Y,Rotation,Damage) {
+  this.xPos = X;
+  this.yPos = Y;
+  this.rot = Rotation;
+  this.Dam = Damage;
+  this.tick = function() {
+    //move
+    this.xPos -= Math.sin(this.rot);
+    this.yPos += Math.cos(this.rot);
+    // hitbox walls
+    //hitbox enemys
+    //hitbox player
+  }
+  //render
+  this.render = function() {
+    fill(255,0,0);
+    ellipse(this.xPos,this.yPos,4,4);
+  }
+}
+
+var bullets = []
+
 function player() {
   this.xPos = 100;
   this.yPos = 100;
   this.xSpeed = 0;
   this.ySpeed = 0;
-  this.direction = 0;
+  this.rot = 0;
   this.health = 100;
   // controls
   this.controls = function() {
     if (keyIsDown(65)) { //a
-      this.direction -= 0.05;
+      this.rot -= 0.05;
     }
     if (keyIsDown(68)) { //d
-      this.direction += 0.05;
+      this.rot += 0.05;
     }
     if (keyIsDown(87)) { //w
-      this.xSpeed -= Math.sin(this.direction);
-      this.ySpeed += Math.cos(this.direction);
+      this.xSpeed -= Math.sin(this.rot);
+      this.ySpeed += Math.cos(this.rot);
     }
     if (keyIsDown(83)) { //s
-      this.xSpeed += Math.sin(this.direction);
-      this.ySpeed -= Math.cos(this.direction);
+      this.xSpeed += Math.sin(this.rot);
+      this.ySpeed -= Math.cos(this.rot);
     }
     a = 0;
     //hitboxing walls
@@ -78,7 +100,7 @@ function player() {
     fill(0,0,0); //color = black
     translate(this.xPos,this.yPos);
     push();
-    rotate(this.direction);
+    rotate(this.rot);
     rectMode(CENTER);
     image(player_img, -37.5, -37.5, 75, 75);
     stroke(255,0,0);
@@ -96,6 +118,11 @@ function draw() {
     background(100);
     fill(0, 255, 0);
     noStroke();
+    a = 0;
+    while (a < bullets.length) {
+      bullets[a].tick();
+      a += 1;
+    }
     Player.controls();
     a = 0;
     while (a < walls.length) {
@@ -103,6 +130,11 @@ function draw() {
       a += 1;
     }
     Player.render();
+    a = 0;
+    while (a < bullets.length) {
+      bullets[a].render();
+      a += 1;
+    }
   }
   count += 1;
 }
