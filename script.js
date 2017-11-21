@@ -127,8 +127,6 @@ function player() {
     rotate(this.rot);
     rectMode(CENTER);
     image(player_img, -37.5, -37.5, 75, 75);
-    stroke(255,0,0);
-    line(0,0,0,50);
     pop();
   }
 }
