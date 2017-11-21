@@ -8,6 +8,14 @@ var a = 0;
 var dx = 0;
 var dy = 0;
 
+function posit(a) {
+  return(sqrt(a*a));
+}
+
+function isPosit(a) {
+  return(a >= 0);
+}
+
 function setup() {
   createCanvas(xScreenSize, yScreenSize);
   player_img = loadImage("images/pon.png");
@@ -81,10 +89,26 @@ function player() {
     while (a < walls.length) {
       dx = walls[a].xPos - this.xPos;
       dy = walls[a].yPos - this.yPos;
-      if (Math.sqrt((dx*dx)+(dy*dy)) < ((10) + (70/3))) {
+//    Math.sqrt((dx*dx)+(dy*dy)) < ((walls[a].size / 2) + (70/2))
+      if ((posit(dx) < ((walls[a].size / 2) + (70/2))) && (posit(dy) < ((walls[a].size / 2) + (70/2)))) {
         this.health -= 5;
-        this.xSpeed += dx / -50;
-        this.ySpeed += dy / -50;
+        if (posit(dx) > posit(dy)) {
+          if (!(isPosit(dx))) {
+            this.xPos = walls[a].xPos + (walls[a].size / 2) + (70/2);
+            this.xSpeed = 0;
+          } else {
+            this.xPos = walls[a].xPos - (walls[a].size / 2) - (70/2);
+            this.xSpeed = 0;
+          }
+        } else {
+          if (!(isPosit(dy))) {
+            this.yPos = walls[a].yPos + (walls[a].size / 2) + (70/2);
+            this.ySpeed = 0;
+          } else {
+            this.yPos = walls[a].yPos - (walls[a].size / 2) - (70/2);
+            this.ySpeed = 0;
+          }
+        }
       }
       a += 1;
     }
