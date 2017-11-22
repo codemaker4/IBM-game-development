@@ -53,7 +53,7 @@ function bullet(X,Y,Rotation,Damage) {
     // hitbox walls
     //hitbox enemys
     //hitbox player
-    if (this.age > 1000){
+    if (this.age > 250){
       aBullets.splice(aBullets.indexOf(self), 1);
     }
     this.age += 1;
