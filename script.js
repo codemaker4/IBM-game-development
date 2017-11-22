@@ -2,6 +2,7 @@ var xScreenSize = innerWidth-20;
 var yScreenSize = innerHeight-20;
 var stage = 0;
 var walls = [];
+var aBullets = [];
 var player_img;
 var barricade_img;
 var a = 0;
@@ -28,7 +29,7 @@ function wall(X,Y,size) {
   this.yPos = Y;
   this.size = size;
   this.health = 3;
-  // hitbox bullets
+  // hitbox aBullets
   // render
   this.render = function() {
     rectMode(CENTER);
@@ -44,22 +45,25 @@ function bullet(X,Y,Rotation,Damage) {
   this.yPos = Y;
   this.rot = Rotation;
   this.Dam = Damage;
+  this.age = 0;
   this.tick = function() {
     //move
-    this.xPos -= Math.sin(this.rot);
-    this.yPos += Math.cos(this.rot);
+    this.xPos -= Math.sin(this.rot) * 5;
+    this.yPos += Math.cos(this.rot) * 5;
     // hitbox walls
     //hitbox enemys
     //hitbox player
+    if (this.age > 1000){
+      aBullets.splice(aBullets.indexOf(self), 1);
+    }
+    this.age += 1;
   }
   //render
   this.render = function() {
     fill(255,0,0);
-    ellipse(this.xPos,this.yPos,4,4);
+    ellipse(this.xPos,this.yPos,this.Dam,this.Dam);
   }
 }
-
-var bullets = []
 
 function player() {
   this.xPos = 100;
@@ -117,7 +121,7 @@ function player() {
     this.xSpeed = this.xSpeed * 0.95;
     this.ySpeed = this.ySpeed * 0.95;
   }
-  // hitboxing bullets
+  // hitboxing aBullets
   // hitboxing enemys
   // render
   this.render = function() {
@@ -140,9 +144,12 @@ function draw() {
     background(100);
     fill(0, 255, 0);
     noStroke();
+    if (keyIsDown(32)) { //s
+      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Player.rot, 4);
+    }
     a = 0;
-    while (a < bullets.length) {
-      bullets[a].tick();
+    while (a < aBullets.length) {
+      aBullets[a].tick();
       a += 1;
     }
     Player.controls();
@@ -151,12 +158,12 @@ function draw() {
       walls[a].render();
       a += 1;
     }
-    Player.render();
     a = 0;
-    while (a < bullets.length) {
-      bullets[a].render();
+    while (a < aBullets.length) {
+      aBullets[a].render();
       a += 1;
     }
+    Player.render();
   }
   count += 1;
 }
