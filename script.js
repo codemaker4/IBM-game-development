@@ -63,8 +63,8 @@ function bullet(X,Y,XS,YS,Damage) {
   this.age = 0;
   this.tick = function() {
     //move
-    this.xPos += xSpeed;
-    this.yPos += ySpeed;
+    this.xPos += this.xSpeed;
+    this.yPos += this.ySpeed;
     // hitbox walls
     //hitbox enemys
     //hitbox player
@@ -161,7 +161,7 @@ function draw() {
     noStroke();
     if (keyIsDown(32)) { // spacebar
       if (reload <= 0) {
-        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, (Math.sin(Player.rot) * -1) + Player.xSpeed, Math.cos(Player.rot) + Player.ySpeed, 4);
+        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, (Math.sin(Player.rot + Math.PI / 2) * 5) - Player.xSpeed, (Math.cos(Player.rot + Math.PI / 2) * 5) + Player.ySpeed, 4);
         reload = 50;
       }
     }
