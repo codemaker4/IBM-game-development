@@ -52,16 +52,17 @@ function wall(X,Y,size) {
 
 walls = [new wall(150,150,20), new wall(160,160,20), new wall(170,160,20), new wall(180,160,20)];
 
-function bullet(X,Y,Rotation,Damage) {
+function bullet(X,Y,XS,YS,Damage) {
   this.xPos = X;
   this.yPos = Y;
-  this.rot = Rotation;
-  this.Dam = Damage;
+  this.ySpeed = XS;
+  this.xSpeed = YS;
+  this.Dam = damage;
   this.age = 0;
   this.tick = function() {
     //move
-    this.xPos -= Math.sin(this.rot) * 5;
-    this.yPos += Math.cos(this.rot) * 5;
+    this.xPos += xSpeed;
+    this.yPos += ySpeed;
     // hitbox walls
     //hitbox enemys
     //hitbox player
@@ -153,12 +154,12 @@ var count = 0;
 
 function draw() {
   if (stage == 0){
-    background(100);
+    background(50,50,50,255);
     fill(0, 255, 0);
     noStroke();
     if (keyIsDown(32)) { // spacebar
       if (reload <= 0) {
-        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Player.rot, 4);
+        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, (Math.sin(Player.rot) * -1) + Player.xSpeed, Math.cos(Player.rot) + Player.ySpeed, 4);
         reload = 50;
       }
     }
@@ -168,8 +169,8 @@ function draw() {
       a += 1;
     }
     Player.controls();
-    cameraX = Player.xPos + (Player.xSpeed * 5) - (xScreenSize / 2);
-    cameraY = Player.yPos + (Player.ySpeed * 5) - (yScreenSize / 2);
+    cameraX = Player.xPos + (Player.xSpeed * 10) - (xScreenSize / 2);
+    cameraY = Player.yPos + (Player.ySpeed * 10) - (yScreenSize / 2);
     a = 0;
     while (a < walls.length) {
       walls[a].render();
