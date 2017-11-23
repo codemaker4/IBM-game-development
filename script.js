@@ -9,6 +9,8 @@ var a = 0;
 var dx = 0;
 var dy = 0;
 var reload = 0;
+var cameraX = 0;
+var cameraY = 0;
 
 function posit(a) {
   return(sqrt(a*a));
@@ -25,14 +27,14 @@ function setup() {
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
-function create_walls(){
-  while (var i < walls.length) {
-    if (walls[i].xPos <= (0 + CameraX)){
-
-    }
-    i ++;
-  }
-}
+//function create_walls(){
+//  while (var i < walls.length) {
+//    if (walls[i].xPos <= (0 + CameraX)){/
+//
+//    }
+//    i ++;
+//  }
+//}
 
 function wall(X,Y,size) {
   this.xPos = X;
@@ -44,7 +46,7 @@ function wall(X,Y,size) {
   this.render = function() {
     rectMode(CENTER);
     fill(255);
-    image(barricade_img, this.xPos - (size/2), this.yPos - (size/2), size, size);
+    image(barricade_img, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, size, size);
   }
 }
 
@@ -63,7 +65,7 @@ function bullet(X,Y,Rotation,Damage) {
     // hitbox walls
     //hitbox enemys
     //hitbox player
-    if (this.xPos > xScreenSize || this.xPos < 0 || this.yPos > yScreenSize || this.yPos < 0){
+    if (this.xPos - cameraX > xScreenSize || this.xPos - cameraX < 0 || this.yPos - cameraY > yScreenSize || this.yPos - cameraY < 0){
       aBullets.splice(aBullets.indexOf(this), 1);
     }
     this.age += 1;
@@ -71,7 +73,7 @@ function bullet(X,Y,Rotation,Damage) {
   //render
   this.render = function() {
     fill(255,0,0);
-    ellipse(this.xPos,this.yPos,this.Dam,this.Dam);
+    ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam,this.Dam);
   }
 }
 
@@ -136,7 +138,7 @@ function player() {
   // render
   this.render = function() {
     fill(0,0,0); //color = black
-    translate(this.xPos,this.yPos);
+    translate(this.xPos - cameraX,this.yPos - cameraY);
     push();
     rotate(this.rot);
     rectMode(CENTER);
@@ -166,6 +168,8 @@ function draw() {
       a += 1;
     }
     Player.controls();
+    cameraX = Player.xPos + (Player.xSpeed * 5) - (xScreenSize / 2);
+    cameraY = Player.yPos + (Player.ySpeed * 5) - (yScreenSize / 2);
     a = 0;
     while (a < walls.length) {
       walls[a].render();
