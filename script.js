@@ -8,6 +8,7 @@ var barricade_img;
 var a = 0;
 var dx = 0;
 var dy = 0;
+var reload = 0;
 
 function posit(a) {
   return(sqrt(a*a));
@@ -53,8 +54,8 @@ function bullet(X,Y,Rotation,Damage) {
     // hitbox walls
     //hitbox enemys
     //hitbox player
-    if (this.age > 250){
-      aBullets.splice(aBullets.indexOf(self), 1);
+    if (this.xPos > xScreenSize || this.xPos < 0 || this.yPos > yScreenSize || this.yPos < 0){
+      aBullets.splice(aBullets.indexOf(this), 1);
     }
     this.age += 1;
   }
@@ -145,7 +146,10 @@ function draw() {
     fill(0, 255, 0);
     noStroke();
     if (keyIsDown(32)) { //s
-      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Player.rot, 4);
+      if (reload <= 0) {
+        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Player.rot, 4);
+        reload = 50;
+      }
     }
     a = 0;
     while (a < aBullets.length) {
@@ -166,4 +170,5 @@ function draw() {
     Player.render();
   }
   count += 1;
+  reload -= 1;
 }
