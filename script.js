@@ -11,6 +11,7 @@ var dy = 0;
 var reload = 0;
 var cameraX = 0;
 var cameraY = 0;
+var i;
 
 function posit(a) {
   return(sqrt(a*a));
@@ -27,14 +28,15 @@ function setup() {
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
-//function create_walls(){
-//  while (var i < walls.length) {
-//    if (walls[i].xPos <= (0 + CameraX)){/
-//
-//    }
-//    i ++;
-//  }
-//}
+function create_walls(){
+  i = 0;
+  while (i < walls.length) {
+    if (walls[i].xPos - cameraX <= 0 || walls[i].xPos - cameraX >= xScreenSize){
+      console.log("kapoef");
+    }
+    i ++;
+  }
+}
 
 function wall(X,Y,size) {
   this.xPos = X;
@@ -154,7 +156,7 @@ var count = 0;
 
 function draw() {
   if (stage == 0){
-    background(50,50,50,255);
+    background(0,0,25,255);
     fill(0, 255, 0);
     noStroke();
     if (keyIsDown(32)) { // spacebar
