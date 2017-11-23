@@ -25,6 +25,15 @@ function setup() {
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
+function create_walls(){
+  while (var i < walls.length) {
+    if (walls[i].xPos <= (0 + CameraX)){
+
+    }
+    i ++;
+  }
+}
+
 function wall(X,Y,size) {
   this.xPos = X;
   this.yPos = Y;
@@ -145,7 +154,7 @@ function draw() {
     background(100);
     fill(0, 255, 0);
     noStroke();
-    if (keyIsDown(32)) { //s
+    if (keyIsDown(32)) { // spacebar
       if (reload <= 0) {
         aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Player.rot, 4);
         reload = 50;
