@@ -9,6 +9,9 @@ var a = 0;
 var dx = 0;
 var dy = 0;
 var reload = 0;
+var cameraX = 0;
+var cameraY = 0;
+var i;
 
 function posit(a) {
   return(sqrt(a*a));
@@ -26,9 +29,10 @@ function setup() {
 }
 
 function create_walls(){
-  while (var i < walls.length) {
-    if (walls[i].xPos <= (0 + CameraX)){
-
+  i = 0;
+  while (i < walls.length) {
+    if (walls[i].xPos - cameraX <= 0 || walls[i].xPos - cameraX >= xScreenSize){
+      console.log("kapoef");
     }
     i ++;
   }
@@ -44,26 +48,27 @@ function wall(X,Y,size) {
   this.render = function() {
     rectMode(CENTER);
     fill(255);
-    image(barricade_img, this.xPos - (size/2), this.yPos - (size/2), size, size);
+    image(barricade_img, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, size, size);
   }
 }
 
 walls = [new wall(150,150,20), new wall(160,160,20), new wall(170,160,20), new wall(180,160,20)];
 
-function bullet(X,Y,Rotation,Damage) {
+function bullet(X,Y,XS,YS,Damage) {
   this.xPos = X;
   this.yPos = Y;
-  this.rot = Rotation;
+  this.ySpeed = XS;
+  this.xSpeed = YS;
   this.Dam = Damage;
   this.age = 0;
   this.tick = function() {
     //move
-    this.xPos -= Math.sin(this.rot) * 5;
-    this.yPos += Math.cos(this.rot) * 5;
+    this.xPos += xSpeed;
+    this.yPos += ySpeed;
     // hitbox walls
     //hitbox enemys
     //hitbox player
-    if (this.xPos > xScreenSize || this.xPos < 0 || this.yPos > yScreenSize || this.yPos < 0){
+    if (this.xPos - cameraX > xScreenSize || this.xPos - cameraX < 0 || this.yPos - cameraY > yScreenSize || this.yPos - cameraY < 0){
       aBullets.splice(aBullets.indexOf(this), 1);
     }
     this.age += 1;
@@ -71,7 +76,7 @@ function bullet(X,Y,Rotation,Damage) {
   //render
   this.render = function() {
     fill(255,0,0);
-    ellipse(this.xPos,this.yPos,this.Dam,this.Dam);
+    ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam,this.Dam);
   }
 }
 
@@ -136,7 +141,7 @@ function player() {
   // render
   this.render = function() {
     fill(0,0,0); //color = black
-    translate(this.xPos,this.yPos);
+    translate(this.xPos - cameraX,this.yPos - cameraY);
     push();
     rotate(this.rot);
     rectMode(CENTER);
@@ -151,12 +156,12 @@ var count = 0;
 
 function draw() {
   if (stage == 0){
-    background(100);
+    background(0,0,25,255);
     fill(0, 255, 0);
     noStroke();
     if (keyIsDown(32)) { // spacebar
       if (reload <= 0) {
-        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Player.rot, 4);
+        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, (Math.sin(Player.rot) * -1) + Player.xSpeed, Math.cos(Player.rot) + Player.ySpeed, 4);
         reload = 50;
       }
     }
@@ -166,6 +171,8 @@ function draw() {
       a += 1;
     }
     Player.controls();
+    cameraX = Player.xPos + (Player.xSpeed * 10) - (xScreenSize / 2);
+    cameraY = Player.yPos + (Player.ySpeed * 10) - (yScreenSize / 2);
     a = 0;
     while (a < walls.length) {
       walls[a].render();
