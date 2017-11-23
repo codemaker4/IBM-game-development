@@ -57,7 +57,7 @@ function bullet(X,Y,XS,YS,Damage) {
   this.yPos = Y;
   this.ySpeed = XS;
   this.xSpeed = YS;
-  this.Dam = damage;
+  this.Dam = Damage;
   this.age = 0;
   this.tick = function() {
     //move
