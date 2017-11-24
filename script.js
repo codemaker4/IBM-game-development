@@ -1,5 +1,5 @@
-var xScreenSize = innerWidth-20;
-var yScreenSize = innerHeight-20;
+var xScreenSize = innerWidth - 4;
+var yScreenSize = innerHeight - 5;
 var stage = 0;
 var walls = [];
 var aBullets = [];
