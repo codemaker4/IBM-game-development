@@ -1,17 +1,19 @@
-var xScreenSize = innerWidth - 4;
+var xScreenSize = innerWidth - 4; // canvas size
 var yScreenSize = innerHeight - 5;
-var stage = 0;
-var walls = [];
-var aBullets = [];
-var player_img;
-var barricade_img;
-var a = 0;
-var dx = 0;
+var stage = 0; // 0 = ingame
+var walls = []; // lsit with all wall objects
+var aBullets = []; // list with all bullet objects
+var player_img; // image of player
+var barricade_img; // image for wall
+var a = 0; // loop counter
+var dx = 0; // disnatce X and Y used in many onjects in hitboxing
 var dy = 0;
-var reload = 0;
-var cameraX = 0;
+var reload = 0; // reload variable, if <= 0 player can fire
+var cameraX = 0; // cameraX and Y, X and Y position of camera.
 var cameraY = 0;
-var i;
+var i; // loop variable
+var AXSpeed = 0; // average X and Y speed of player
+var AYSpeed = 0;
 
 function posit(a) {
   return(sqrt(a*a));
@@ -76,7 +78,7 @@ function bullet(X,Y,XS,YS,Damage) {
   //render
   this.render = function() {
     fill(255,0,0);
-    ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam,this.Dam);
+    ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam * 5,this.Dam * 5);
   }
 }
 
@@ -161,7 +163,7 @@ function draw() {
     noStroke();
     if (keyIsDown(32)) { // spacebar
       if (reload <= 0) {
-        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, (Math.sin(Player.rot + Math.PI / 2) * 5) - Player.xSpeed, (Math.cos(Player.rot + Math.PI / 2) * 5) + Player.ySpeed, 4);
+        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, (Math.sin(Player.rot + Math.PI / 2) * 5) - Player.xSpeed, (Math.cos(Player.rot + Math.PI / 2) * 5) + Player.ySpeed, 2);
         reload = 50;
       }
     }
@@ -171,8 +173,10 @@ function draw() {
       a += 1;
     }
     Player.controls();
-    cameraX = Player.xPos + (Player.xSpeed * 10) - (xScreenSize / 2);
-    cameraY = Player.yPos + (Player.ySpeed * 10) - (yScreenSize / 2);
+    AXSpeed = (Player.xSpeed + (AXSpeed * 3)) / 4;
+    AYSpeed = (Player.ySpeed + (AYSpeed * 3)) / 4;
+    cameraX = Player.xPos + (AXSpeed * 10) - (xScreenSize / 2);
+    cameraY = Player.yPos + (AYSpeed * 10) - (yScreenSize / 2);
     a = 0;
     while (a < walls.length) {
       walls[a].render();
