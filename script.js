@@ -163,7 +163,7 @@ function draw() {
     noStroke();
     if (keyIsDown(32)) { // spacebar
       if (reload <= 0) {
-        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, (Math.sin(Player.rot + Math.PI / 2) * 5) - Player.xSpeed, (Math.cos(Player.rot + Math.PI / 2) * 5) + Player.ySpeed, 2);
+        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2);
         reload = 50;
       }
     }
