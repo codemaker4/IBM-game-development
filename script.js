@@ -118,20 +118,24 @@ function player() {
             this.xPos = walls[a].xPos + (walls[a].size / 2) + (70/2);
             this.xSpeed = 0;
             this.ySpeed = this.ySpeed / 5;
+            this.rot += this.ySpeed / 10;
           } else {
             this.xPos = walls[a].xPos - (walls[a].size / 2) - (70/2);
             this.xSpeed = 0;
             this.ySpeed = this.ySpeed / 5;
+            this.rot -= this.ySpeed / 10;
           }
         } else {
           if (!(isPosit(dy))) {
             this.yPos = walls[a].yPos + (walls[a].size / 2) + (70/2);
             this.ySpeed = 0;
             this.xSpeed = this.xSpeed / 5;
+            this.rot -= this.xSpeed / 10;
           } else {
             this.yPos = walls[a].yPos - (walls[a].size / 2) - (70/2);
             this.ySpeed = 0;
             this.xSpeed = this.xSpeed / 5;
+            this.rot += this.xSpeed / 10;
           }
         }
       }
