@@ -37,6 +37,17 @@ function create_walls(){
       console.log("kapoef");
       walls.splice(i, 1);
       i -= 1;
+      randint = Math.floor(random(1,5));
+      console.log(randint);
+      if(randint == 1){
+        walls[walls.lengt] = new wall(20, 20, 20);
+      }else if(randint == 2){
+        walls[walls.lengt] = new wall(20, 100, 20);
+      } else if(randint == 3){
+        walls[walls.lengt] = new wall(100, 20, 20);
+      } else if (randint == 4) {
+        walls[walls.lengt] = new wall(100, 100, 20);
+      }
     }
     i += 1;
   }
