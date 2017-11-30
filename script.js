@@ -40,13 +40,13 @@ function create_walls(){
       randint = Math.floor(random(1,5));
       console.log(randint);
       if(randint == 1){
-        walls[walls.lengt] = new wall(20, 20, 20);
+        walls[walls.length] = new wall(Player.xPos + 1000, Player.yPos, 20);
       }else if(randint == 2){
-        walls[walls.lengt] = new wall(20, 100, 20);
+        walls[walls.length] = new wall(Player.xPos - 1000, Player.yPos, 20);
       } else if(randint == 3){
-        walls[walls.lengt] = new wall(100, 20, 20);
+        walls[walls.length] = new wall(Player.xPos, Player.yPos + 1000, 20);
       } else if (randint == 4) {
-        walls[walls.lengt] = new wall(100, 100, 20);
+        walls[walls.length] = new wall(Player.xPos, Player.yPos - 1000, 20);
       }
     }
     i += 1;
