@@ -5,6 +5,7 @@ var walls = []; // lsit with all wall objects
 var aBullets = []; // list with all bullet objects
 var player_img; // image of player
 var barricade_img; // image for wall
+var aantal_muren = 30; // aantal muren in het begin
 var a = 0; // loop counter
 var dx = 0; // disnatce X and Y used in many onjects in hitboxing
 var dy = 0;
@@ -15,6 +16,7 @@ var i; // loop variable
 var AXSpeed = 0; // average X and Y speed of player
 var AYSpeed = 0;
 
+
 function posit(a) {
   return(sqrt(a*a));
 }
@@ -24,6 +26,9 @@ function isPosit(a) {
 }
 
 function setup() {
+  for (j = 0; j < aantal_muren; j++){
+    walls[walls.length] = new wall(random(0, xScreenSize-20), random(0, yScreenSize-20), 20);
+  }
   createCanvas(xScreenSize, yScreenSize);
   player_img = loadImage("images/pon.png");
   barricade_img = loadImage("images/barriecade.png");
@@ -67,7 +72,6 @@ function wall(X,Y,size) {
   }
 }
 
-walls = [new wall(150,10,20), new wall(160,160,20), new wall(170,160,20), new wall(180,160,20)];
 
 function bullet(X,Y,XS,YS,Damage) {
   this.xPos = X;
