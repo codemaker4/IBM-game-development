@@ -33,10 +33,12 @@ function setup() {
 function create_walls(){
   i = 0;
   while (i < walls.length) {
-    if (walls[i].xPos - cameraX <= 0 || walls[i].xPos - cameraX >= xScreenSize){
+    if ((walls[i].xPos - cameraX <= -1000) || (walls[i].xPos - cameraX >= xScreenSize + 1000) || (walls[i].yPos - cameraY <= -1000) || (walls[i].yPos - cameraY >= yScreenSize + 1000)){
       console.log("kapoef");
+      walls.splice(i, 1);
+      i -= 1;
     }
-    i ++;
+    i += 1;
   }
 }
 
@@ -54,7 +56,7 @@ function wall(X,Y,size) {
   }
 }
 
-walls = [new wall(150,150,20), new wall(160,160,20), new wall(170,160,20), new wall(180,160,20)];
+walls = [new wall(150,10,20), new wall(160,160,20), new wall(170,160,20), new wall(180,160,20)];
 
 function bullet(X,Y,XS,YS,Damage) {
   this.xPos = X;
@@ -165,6 +167,7 @@ var Player = new player();
 var count = 0;
 
 function draw() {
+  create_walls();
   if (stage == 0){
     background(0,0,25,255);
     fill(0, 255, 0);
