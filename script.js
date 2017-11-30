@@ -5,7 +5,7 @@ var walls = []; // lsit with all wall objects
 var aBullets = []; // list with all bullet objects
 var player_img; // image of player
 var barricade_img; // image for wall
-var aantal_muren = 100; // aantal muren in het begin
+var aantal_muren = 25; // aantal muren in het begin
 var a = 0; // loop counter
 var dx = 0; // disnatce X and Y used in many onjects in hitboxing
 var dy = 0;
