@@ -5,7 +5,7 @@ var walls = []; // lsit with all wall objects
 var aBullets = []; // list with all bullet objects
 var player_img; // image of player
 var barricade_img; // image for wall
-var aantal_muren = 30; // aantal muren in het begin
+var aantal_muren = 100; // aantal muren in het begin
 var a = 0; // loop counter
 var dx = 0; // disnatce X and Y used in many onjects in hitboxing
 var dy = 0;
@@ -42,17 +42,9 @@ function create_walls(){
       console.log("kapoef");
       walls.splice(i, 1);
       i -= 1;
-      randint = Math.floor(random(1,5));
+      randint = Math.floor(random(0,359));
       console.log(randint);
-      if(randint == 1){
-        walls[walls.length] = new wall(Player.xPos + 1000, Player.yPos, 20);
-      }else if(randint == 2){
-        walls[walls.length] = new wall(Player.xPos - 1000, Player.yPos, 20);
-      } else if(randint == 3){
-        walls[walls.length] = new wall(Player.xPos, Player.yPos + 1000, 20);
-      } else if (randint == 4) {
-        walls[walls.length] = new wall(Player.xPos, Player.yPos - 1000, 20);
-      }
+      walls[walls.length] = new wall(Math.sin(randint) * 1000 + Player.xPos, Math.cos(randint) * 1000 + Player.yPos, 20);
     }
     i += 1;
   }
