@@ -30,7 +30,7 @@ function isPosit(a) {
 function setup() {
   // create random walls
   for (j = 0; j < aantal_muren; j++){
-    walls[walls.length] = new wall(random(0, xScreenSize-20), random(0, yScreenSize-20), 20);
+    walls[walls.length] = new wall(random(0 - xScreenSize/2, xScreenSize-20), random(0 - yScreenSize/2, yScreenSize-20), 20);
   }
   createCanvas(xScreenSize, yScreenSize);
   player_img = loadImage("images/pon.png");
