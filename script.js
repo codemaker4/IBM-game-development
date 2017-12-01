@@ -15,6 +15,7 @@ var cameraY = 0;
 var i; // loop variable
 var AXSpeed = 0; // average X and Y speed of player
 var AYSpeed = 0;
+var amount_of_walls_dis = 0;
 
 
 function posit(a) {
@@ -26,6 +27,7 @@ function isPosit(a) {
 }
 
 function setup() {
+  // create random walls
   for (j = 0; j < aantal_muren; j++){
     walls[walls.length] = new wall(random(0, xScreenSize-20), random(0, yScreenSize-20), 20);
   }
@@ -37,14 +39,17 @@ function setup() {
 
 function create_walls(){
   i = 0;
+  amount_of_walls_dis = 0;
   while (i < walls.length) {
     if ((walls[i].xPos - cameraX <= -1000) || (walls[i].xPos - cameraX >= xScreenSize + 1000) || (walls[i].yPos - cameraY <= -1000) || (walls[i].yPos - cameraY >= yScreenSize + 1000)){
-      console.log("kapoef");
+      amount_of_walls_dis += 1;
       walls.splice(i, 1);
       i -= 1;
       randint = Math.floor(random(0,359));
-      console.log(randint);
       walls[walls.length] = new wall(Math.sin(randint) * 1000 + Player.xPos, Math.cos(randint) * 1000 + Player.yPos, 20);
+    }
+    if (amount_of_walls_dis > 0){
+      console.log(amount_of_walls_dis);
     }
     i += 1;
   }
