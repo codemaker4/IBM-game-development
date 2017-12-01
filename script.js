@@ -155,7 +155,7 @@ function enemy(X, Y, HP) {
   }
 }
 
-enemies = [new enemy(0,0,1)];
+enemies = [new enemy(0,0,1), new enemy(100,100,1)];
 
 function player() {
   this.xPos = 100;
