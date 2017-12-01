@@ -251,6 +251,12 @@ function draw() {
         reload = 50;
       }
     }
+    if (keyIsDown(16) && keyIsDown(8)) { //shift + backspace
+      if (reload <= 0) {
+        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2);
+        reload = 10;
+      }
+    }
     a = 0;
     while (a < aBullets.length) {
       aBullets[a].tick();
