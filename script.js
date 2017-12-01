@@ -50,7 +50,7 @@ function create_walls(){
       walls[walls.length] = new wall(Math.sin(randint) * 1000 + Player.xPos, Math.cos(randint) * 1000 + Player.yPos, 20);
     }
     if (amount_of_walls_dis > 0){
-      console.log(amount_of_walls_dis);
+//      console.log(amount_of_walls_dis);
     }
     i += 1;
   }
