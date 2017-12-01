@@ -96,6 +96,14 @@ function bullet(X,Y,XS,YS,Damage) {
   }
 }
 
+function enemy(X, Y, HP) {
+  this.xPos = X;
+  this.yPos = Y;
+  this.health = HP;
+  this.xSpeed = 0;
+  this.ySpeed = 0;
+}
+
 function player() {
   this.xPos = 100;
   this.yPos = 100;
@@ -187,7 +195,7 @@ function draw() {
     if (keyIsDown(32)) { // spacebar
       if (reload <= 0) {
         aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2);
-        reload = 50;
+        reload += 50;
       }
     }
     a = 0;
