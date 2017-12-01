@@ -107,8 +107,8 @@ function enemy(X, Y, HP) {
   this.ai = function() {
     dx = Player.xPos - this.xPos;
     dy = Player.yPos - this.yPos;
-    this.xSpeed += dx / 100;
-    this.ySpeed += dy / 100;
+    this.xSpeed += Math.sin(Math.asin(dx / 10000)) * 100;
+    this.ySpeed += Math.cos(Math.acos(dy / 10000)) * 100;
     this.xSpeed = this.xSpeed / 1.2;
     this.ySpeed = this.ySpeed / 1.2;
     a = 0;
