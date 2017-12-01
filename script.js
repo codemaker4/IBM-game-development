@@ -103,6 +103,7 @@ function enemy(X, Y, HP) {
   this.health = HP;
   this.xSpeed = 0;
   this.ySpeed = 0;
+  this.size = 30;
   this.ai = function() {
     dx = Player.xPos - this.xPos;
     dy = Player.yPos - this.yPos;
@@ -115,28 +116,28 @@ function enemy(X, Y, HP) {
       dx = walls[a].xPos - this.xPos;
       dy = walls[a].yPos - this.yPos;
 //    Math.sqrt((dx*dx)+(dy*dy)) < ((walls[a].size / 2) + (70/2))
-      if ((posit(dx) < ((walls[a].size / 2) + (70/2))) && (posit(dy) < ((walls[a].size / 2) + (10/2)))) {
+      if ((posit(dx) < ((walls[a].size / 2) + (70/2))) && (posit(dy) < ((walls[a].size / 2) + (this.size/2)))) {
         this.health -= 5;
         if (posit(dx) > posit(dy)) {
           if (!(isPosit(dx))) {
-            this.xPos = walls[a].xPos + (walls[a].size / 2) + (10/2) + 1;
+            this.xPos = walls[a].xPos + (walls[a].size / 2) + (this.size/2) + 1;
             this.xSpeed = 0;
             this.ySpeed = this.ySpeed / 5;
             this.rot += this.ySpeed / 10;
           } else {
-            this.xPos = walls[a].xPos - (walls[a].size / 2) - (10/2) - 1;
+            this.xPos = walls[a].xPos - (walls[a].size / 2) - (this.size/2) - 1;
             this.xSpeed = 0;
             this.ySpeed = this.ySpeed / 5;
             this.rot -= this.ySpeed / 10;
           }
         } else {
           if (!(isPosit(dy))) {
-            this.yPos = walls[a].yPos + (walls[a].size / 2) + (10/2) + 1;
+            this.yPos = walls[a].yPos + (walls[a].size / 2) + (this.size/2) + 1;
             this.ySpeed = 0;
             this.xSpeed = this.xSpeed / 5;
             this.rot -= this.xSpeed / 10;
           } else {
-            this.yPos = walls[a].yPos - (walls[a].size / 2) - (10/2) - 1;
+            this.yPos = walls[a].yPos - (walls[a].size / 2) - (this.size/2) - 1;
             this.ySpeed = 0;
             this.xSpeed = this.xSpeed / 5;
             this.rot += this.xSpeed / 10;
@@ -150,7 +151,7 @@ function enemy(X, Y, HP) {
   }
   this.render = function() {
     fill(0,0,255,255);
-    ellipse(this.xPos - cameraX,this.yPos - cameraY,10,10);
+    ellipse(this.xPos - cameraX,this.yPos - cameraY,this.size,this.size);
   }
 }
 
@@ -247,7 +248,7 @@ function draw() {
     if (keyIsDown(32)) { // spacebar
       if (reload <= 0) {
         aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2);
-        reload += 50;
+        reload = 50;
       }
     }
     a = 0;
