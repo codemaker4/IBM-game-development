@@ -16,6 +16,7 @@ var i; // loop variable
 var AXSpeed = 0; // average X and Y speed of player
 var AYSpeed = 0;
 var amount_of_walls_dis = 0;
+var enemies = [];
 
 
 function posit(a) {
@@ -102,7 +103,58 @@ function enemy(X, Y, HP) {
   this.health = HP;
   this.xSpeed = 0;
   this.ySpeed = 0;
+  this.ai = function() {
+    dx = Player.xPos - this.xPos;
+    dy = Player.yPos - this.yPos;
+    this.xSpeed += dx / 100;
+    this.ySpeed += dy / 100;
+    this.xSpeed = this.xSpeed / 1.2;
+    this.ySpeed = this.ySpeed / 1.2;
+    a = 0;
+    while (a < walls.length) {
+      dx = walls[a].xPos - this.xPos;
+      dy = walls[a].yPos - this.yPos;
+//    Math.sqrt((dx*dx)+(dy*dy)) < ((walls[a].size / 2) + (70/2))
+      if ((posit(dx) < ((walls[a].size / 2) + (70/2))) && (posit(dy) < ((walls[a].size / 2) + (10/2)))) {
+        this.health -= 5;
+        if (posit(dx) > posit(dy)) {
+          if (!(isPosit(dx))) {
+            this.xPos = walls[a].xPos + (walls[a].size / 2) + (10/2) + 1;
+            this.xSpeed = 0;
+            this.ySpeed = this.ySpeed / 5;
+            this.rot += this.ySpeed / 10;
+          } else {
+            this.xPos = walls[a].xPos - (walls[a].size / 2) - (10/2) - 1;
+            this.xSpeed = 0;
+            this.ySpeed = this.ySpeed / 5;
+            this.rot -= this.ySpeed / 10;
+          }
+        } else {
+          if (!(isPosit(dy))) {
+            this.yPos = walls[a].yPos + (walls[a].size / 2) + (10/2) + 1;
+            this.ySpeed = 0;
+            this.xSpeed = this.xSpeed / 5;
+            this.rot -= this.xSpeed / 10;
+          } else {
+            this.yPos = walls[a].yPos - (walls[a].size / 2) - (10/2) - 1;
+            this.ySpeed = 0;
+            this.xSpeed = this.xSpeed / 5;
+            this.rot += this.xSpeed / 10;
+          }
+        }
+      }
+      a += 1;
+    }
+    this.xPos += this.xSpeed;
+    this.yPos += this.ySpeed;
+  }
+  this.render = function() {
+    fill(0,0,255,255);
+    ellipse(this.xPos - cameraX,this.yPos - cameraY,10,10);
+  }
 }
+
+enemies = [new enemy(0,0,1)];
 
 function player() {
   this.xPos = 100;
@@ -203,6 +255,11 @@ function draw() {
       aBullets[a].tick();
       a += 1;
     }
+    a = 0;
+    while (a < enemies.length) {
+      enemies[a].ai();
+      a += 1;
+    }
     Player.controls();
     AXSpeed = (Player.xSpeed + (AXSpeed * 3)) / 4;
     AYSpeed = (Player.ySpeed + (AYSpeed * 3)) / 4;
@@ -211,6 +268,11 @@ function draw() {
     a = 0;
     while (a < walls.length) {
       walls[a].render();
+      a += 1;
+    }
+    a = 0;
+    while (a < enemies.length) {
+      enemies[a].render();
       a += 1;
     }
     a = 0;
