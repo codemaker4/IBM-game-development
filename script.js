@@ -183,31 +183,30 @@ function player() {
     a = 0;
     //hitboxing walls
     while (a < walls.length) {
-      dx = walls[a].xPos - this.xPos;
+      dx = walls[a].xPos - this.xPos; // dx = distance X
       dy = walls[a].yPos - this.yPos;
-//    Math.sqrt((dx*dx)+(dy*dy)) < ((walls[a].size / 2) + (70/2))
-      if ((posit(dx) < ((walls[a].size / 2) + (70/2))) && (posit(dy) < ((walls[a].size / 2) + (70/2)))) {
+      if ((posit(dx) < ((walls[a].size / 2) + (75/2))) && (posit(dy) < ((walls[a].size / 2) + (75/2)))) { // if collision
         this.health -= 5;
-        if (posit(dx) > posit(dy)) {
-          if (!(isPosit(dx))) {
-            this.xPos = walls[a].xPos + (walls[a].size / 2) + (70/2);
-            this.xSpeed = 0;
-            this.ySpeed = this.ySpeed / 5;
-            this.rot += this.ySpeed / 10;
-          } else {
-            this.xPos = walls[a].xPos - (walls[a].size / 2) - (70/2);
+        if (posit(dx) > posit(dy)) { // check side of collision step 1
+          if (!(isPosit(dx))) { // check side of collision step 2
+            this.xPos = walls[a].xPos + (walls[a].size / 2) + (75/2); // do Xpos
+            this.xSpeed = 0; // stop xspeed
+            this.ySpeed = this.ySpeed / 5; // slow down y speed (friction)
+            this.rot += this.ySpeed / 10; // roll against wall
+          } else { //check side of collision step 2
+            this.xPos = walls[a].xPos - (walls[a].size / 2) - (75/2);
             this.xSpeed = 0;
             this.ySpeed = this.ySpeed / 5;
             this.rot -= this.ySpeed / 10;
           }
-        } else {
-          if (!(isPosit(dy))) {
-            this.yPos = walls[a].yPos + (walls[a].size / 2) + (70/2);
+        } else { // check side of collision step 1
+          if (!(isPosit(dy))) { // check side of collision step 2
+            this.yPos = walls[a].yPos + (walls[a].size / 2) + (75/2);
             this.ySpeed = 0;
             this.xSpeed = this.xSpeed / 5;
             this.rot -= this.xSpeed / 10;
-          } else {
-            this.yPos = walls[a].yPos - (walls[a].size / 2) - (70/2);
+          } else { // check side of collision step 2
+            this.yPos = walls[a].yPos - (walls[a].size / 2) - (75/2);
             this.ySpeed = 0;
             this.xSpeed = this.xSpeed / 5;
             this.rot += this.xSpeed / 10;
@@ -216,22 +215,21 @@ function player() {
       }
       a += 1;
     }
-    this.xPos += this.xSpeed;
+    this.xPos += this.xSpeed; // update xpos
     this.yPos += this.ySpeed;
-    this.xSpeed = this.xSpeed * 0.95;
+    this.xSpeed = this.xSpeed * 0.95; // slow down slightly
     this.ySpeed = this.ySpeed * 0.95;
   }
-  // hitboxing aBullets
+  // hitboxing bullets
   // hitboxing enemys
   // render
   this.render = function() {
-    fill(0,0,0); //color = black
-    translate(this.xPos - cameraX,this.yPos - cameraY);
-    push();
-    rotate(this.rot);
-    rectMode(CENTER);
-    image(player_img, -37.5, -37.5, 75, 75);
-    pop();
+    translate(this.xPos - cameraX,this.yPos - cameraY); // rotation
+    push(); // rotation
+    rotate(this.rot); // rotation
+    rectMode(CENTER); // image
+    image(player_img, -37.5, -37.5, 75, 75); // image
+    pop(); // rotation
   }
 }
 
@@ -240,9 +238,9 @@ var Player = new player();
 var count = 0;
 
 function draw() {
-  create_walls();
-  if (stage == 0){
-    background(0,0,25,255);
+  create_walls(); // wall algorithim
+  if (stage == 0){ // unused
+    background(0,0,25,255); // darkblue
     fill(0, 255, 0);
     noStroke();
     if (keyIsDown(32)) { // spacebar
@@ -257,38 +255,38 @@ function draw() {
         reload = 10;
       }
     }
-    a = 0;
+    a = 0; // bullets tick
     while (a < aBullets.length) {
       aBullets[a].tick();
       a += 1;
     }
-    a = 0;
+    a = 0; // enemies tick/AI
     while (a < enemies.length) {
       enemies[a].ai();
       a += 1;
     }
-    Player.controls();
-    AXSpeed = (Player.xSpeed + (AXSpeed * 3)) / 4;
+    Player.controls(); // player tick/controls
+    AXSpeed = (Player.xSpeed + (AXSpeed * 3)) / 4; // average X speed of player, camera
     AYSpeed = (Player.ySpeed + (AYSpeed * 3)) / 4;
-    cameraX = Player.xPos + (AXSpeed * 10) - (xScreenSize / 2);
+    cameraX = Player.xPos + (AXSpeed * 10) - (xScreenSize / 2); // camera is set ahead of player based on movement(speed)
     cameraY = Player.yPos + (AYSpeed * 10) - (yScreenSize / 2);
-    a = 0;
+    a = 0; // wall render
     while (a < walls.length) {
       walls[a].render();
       a += 1;
     }
-    a = 0;
+    a = 0; // enemies render
     while (a < enemies.length) {
       enemies[a].render();
       a += 1;
     }
-    a = 0;
+    a = 0; // bullets render
     while (a < aBullets.length) {
       aBullets[a].render();
       a += 1;
     }
-    Player.render();
+    Player.render(); // player renders on top
   }
-  count += 1;
-  reload -= 1;
+  count += 1; // keep count of loop (now unused)
+  reload -= 1; // reload cooldown, if < 0, the allow fire
 }
