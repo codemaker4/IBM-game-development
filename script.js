@@ -42,7 +42,7 @@ function create_walls(){
   i = 0;
   amount_of_walls_dis = 0;
   while (i < walls.length) {
-    if ((walls[i].xPos - cameraX <= -1000) || (walls[i].xPos - cameraX >= xScreenSize + 1000) || (walls[i].yPos - cameraY <= -1000) || (walls[i].yPos - cameraY >= yScreenSize + 1000)){
+    if ((walls[i].xPos - cameraX <= -xScreenSize*2) || (walls[i].xPos - cameraX >= xScreenSize + xScreenSize*2) || (walls[i].yPos - cameraY <= -yScreenSize*2) || (walls[i].yPos - cameraY >= yScreenSize + yScreenSize*2)){
       amount_of_walls_dis += 1;
       walls.splice(i, 1);
       i -= 1;
