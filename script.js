@@ -97,10 +97,11 @@ function bullet(X,Y,XS,YS,Damage) {
   }
 }
 
-function enemy(X, Y, HP) {
+function enemy(X, Y, HP, REL) {
   this.xPos = X;
   this.yPos = Y;
   this.health = HP;
+  this.reload = REL;
   this.xSpeed = 0;
   this.ySpeed = 0;
   this.size = 30;
@@ -146,8 +147,13 @@ function enemy(X, Y, HP) {
       }
       a += 1;
     }
+
     this.xPos += this.xSpeed;
     this.yPos += this.ySpeed;
+    if (reload <= 0) {
+      aBullets[aBullets.length] = new bullet(this.xPos, this.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2);
+      reload = 50;
+    }
   }
   this.render = function() {
     fill(0,0,255,255);
@@ -155,7 +161,7 @@ function enemy(X, Y, HP) {
   }
 }
 
-enemies = [new enemy(0,0,1), new enemy(100,100,1)];
+enemies = [new enemy(0,0,1,50), new enemy(100,100,1,50)];
 
 function player() {
   this.xPos = 100;
