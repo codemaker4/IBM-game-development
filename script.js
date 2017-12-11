@@ -71,13 +71,14 @@ function wall(X,Y,size) {
 }
 
 
-function bullet(X,Y,XS,YS,Damage) {
+function bullet(X,Y,XS,YS,Damage, COL) {
   this.xPos = X;
   this.yPos = Y;
   this.ySpeed = XS;
   this.xSpeed = YS;
   this.Dam = Damage;
   this.age = 0;
+  this.color = COL;
   this.tick = function() {
     //move
     this.xPos += this.xSpeed;
@@ -85,14 +86,14 @@ function bullet(X,Y,XS,YS,Damage) {
     // hitbox walls
     //hitbox enemys
     //hitbox player
-    if (this.xPos - cameraX > xScreenSize || this.xPos - cameraX < 0 || this.yPos - cameraY > yScreenSize || this.yPos - cameraY < 0){
+    if (this.xPos - cameraX > xScreenSize + xScreenSize || this.xPos - cameraX < 0 - xScreenSize || this.yPos - cameraY > yScreenSize + yScreenSize || this.yPos - cameraY < 0 - yScreenSize){
       aBullets.splice(aBullets.indexOf(this), 1);
     }
     this.age += 1;
   }
   //render
   this.render = function() {
-    fill(255,0,0);
+    fill(this.color);
     ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam * 5,this.Dam * 5);
   }
 }
@@ -147,13 +148,13 @@ function enemy(X, Y, HP, REL) {
       }
       a += 1;
     }
-
+    if (this.reload <= 0) {
+      aBullets[aBullets.length] = new bullet(this.xPos, this.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2, [255, 255, 0]);
+      this.reload = 50;
+    }
     this.xPos += this.xSpeed;
     this.yPos += this.ySpeed;
-    if (reload <= 0) {
-      aBullets[aBullets.length] = new bullet(this.xPos, this.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2);
-      reload = 50;
-    }
+    this.reload -= 1;
   }
   this.render = function() {
     fill(0,0,255,255);
@@ -251,13 +252,13 @@ function draw() {
     noStroke();
     if (keyIsDown(32)) { // spacebar
       if (reload <= 0) {
-        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2);
+        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2, [255, 0, 0]);
         reload = 50;
       }
     }
     if (keyIsDown(16) && keyIsDown(8)) { //shift + backspace
       if (reload <= 0) {
-        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2);
+        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2, [0, 0, 255]);
         reload = 10;
       }
     }
