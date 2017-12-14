@@ -7,6 +7,7 @@ var player_img; // image of player
 var barricade_img; // image for wall
 var aantal_muren = 30; // aantal muren in het begin
 var a = 0; // loop counter
+var b = 0;
 var dx = 0; // disnatce X and Y used in many onjects in hitboxing
 var dy = 0;
 var reload = 0; // reload variable, if <= 0 player can fire
@@ -66,7 +67,7 @@ function wall(X,Y,size) {
   this.render = function() {
     rectMode(CENTER);
     fill(255);
-    image(barricade_img, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, size, size);
+    image(barricade_img, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, this.size, this.size);
   }
 }
 
@@ -83,24 +84,24 @@ function bullet(X,Y,XS,YS,Damage, COL) {
     this.xPos += this.xSpeed;
     this.yPos += this.ySpeed;
     // hitbox walls
-    a = 0;
-    while (a < walls.length) {
-      dx = walls[a].xPos - this.xPos;
-      dy = walls[a].yPos - this.yPos;
-//    Math.sqrt((dx*dx)+(dy*dy)) < ((walls[a].size / 2) + (70/2))
-      if ((posit(dx) < ((walls[a].size / 2) + (this.size/2))) && (posit(dy) < ((walls[a].size / 2) + (this.size/2)))) {
-        walls[a].size -= 1;
-        if (walls[a].size < 1) {
-          walls.splice(a, 1);
-          a -= 1;
+    b = 0;
+    while (b < walls.length) {
+      dx = walls[b].xPos - this.xPos;
+      dy = walls[b].yPos - this.yPos;
+      if ((posit(dx) < ((walls[b].size / 2) + (this.Dam*2.5))) && (posit(dy) < ((walls[b].size / 2) + (this.Dam*2.5)))) {
+        walls[b].size -= 1;
+
+        if (walls[b].size < 1) {
+          walls.splice(b, 1);
+          b -= 1;
         }
         this.Dam -= 1;
       }
-      a += 1;
+      b += 1;
     }
     //hitbox enemys
     //hitbox player
-    if (this.xPos - cameraX > xScreenSize + xScreenSize || this.xPos - cameraX < 0 - xScreenSize || this.yPos - cameraY > yScreenSize + yScreenSize || this.yPos - cameraY < 0 - yScreenSize){
+    if (this.xPos - cameraX > xScreenSize + xScreenSize || this.xPos - cameraX < 0 - xScreenSize || this.yPos - cameraY > yScreenSize + yScreenSize || this.yPos - cameraY < 0 - yScreenSize || this.Dam <= 0){
       aBullets.splice(aBullets.indexOf(this), 1);
     }
   }
@@ -126,40 +127,39 @@ function enemy(X, Y, HP, REL) {
     this.ySpeed += Math.cos(Math.acos(dy / 10000)) * 100;
     this.xSpeed = this.xSpeed / 1.2;
     this.ySpeed = this.ySpeed / 1.2;
-    a = 0;
-    while (a < walls.length) {
-      dx = walls[a].xPos - this.xPos;
-      dy = walls[a].yPos - this.yPos;
-//    Math.sqrt((dx*dx)+(dy*dy)) < ((walls[a].size / 2) + (70/2))
-      if ((posit(dx) < ((walls[a].size / 2) + (this.size/2))) && (posit(dy) < ((walls[a].size / 2) + (this.size/2)))) {
+    b = 0;
+    while (b < walls.length) {
+      dx = walls[b].xPos - this.xPos;
+      dy = walls[b].yPos - this.yPos;
+      if ((posit(dx) < ((walls[b].size / 2) + (this.size/2))) && (posit(dy) < ((walls[b].size / 2) + (this.size/2)))) {
         this.health -= 5;
         if (posit(dx) > posit(dy)) {
           if (!(isPosit(dx))) {
-            this.xPos = walls[a].xPos + (walls[a].size / 2) + (this.size/2) + 1;
+            this.xPos = walls[b].xPos + (walls[b].size / 2) + (this.size/2) + 1;
             this.xSpeed = 0;
             this.ySpeed = this.ySpeed / 5;
             this.rot += this.ySpeed / 10;
           } else {
-            this.xPos = walls[a].xPos - (walls[a].size / 2) - (this.size/2) - 1;
+            this.xPos = walls[b].xPos - (walls[b].size / 2) - (this.size/2) - 1;
             this.xSpeed = 0;
             this.ySpeed = this.ySpeed / 5;
             this.rot -= this.ySpeed / 10;
           }
         } else {
           if (!(isPosit(dy))) {
-            this.yPos = walls[a].yPos + (walls[a].size / 2) + (this.size/2) + 1;
+            this.yPos = walls[b].yPos + (walls[b].size / 2) + (this.size/2) + 1;
             this.ySpeed = 0;
             this.xSpeed = this.xSpeed / 5;
             this.rot -= this.xSpeed / 10;
           } else {
-            this.yPos = walls[a].yPos - (walls[a].size / 2) - (this.size/2) - 1;
+            this.yPos = walls[b].yPos - (walls[b].size / 2) - (this.size/2) - 1;
             this.ySpeed = 0;
             this.xSpeed = this.xSpeed / 5;
             this.rot += this.xSpeed / 10;
           }
         }
       }
-      a += 1;
+      b += 1;
     }
     if (this.reload <= 0) {
       aBullets[aBullets.length] = new bullet(this.xPos, this.yPos, Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, 2, [255, 255, 0]);
@@ -202,38 +202,38 @@ function player() {
     }
     a = 0;
     //hitboxing walls
-    while (a < walls.length) {
-      dx = walls[a].xPos - this.xPos; // dx = distance X
-      dy = walls[a].yPos - this.yPos;
-      if ((posit(dx) < ((walls[a].size / 2) + (75/2))) && (posit(dy) < ((walls[a].size / 2) + (75/2)))) { // if collision
+    while (b < walls.length) {
+      dx = walls[b].xPos - this.xPos; // dx = distance X
+      dy = walls[b].yPos - this.yPos;
+      if ((posit(dx) < ((walls[b].size / 2) + (75/2))) && (posit(dy) < ((walls[b].size / 2) + (75/2)))) { // if collision
         this.health -= 5;
         if (posit(dx) > posit(dy)) { // check side of collision step 1
           if (!(isPosit(dx))) { // check side of collision step 2
-            this.xPos = walls[a].xPos + (walls[a].size / 2) + (75/2); // do Xpos
+            this.xPos = walls[b].xPos + (walls[b].size / 2) + (75/2); // do Xpos
             this.xSpeed = 0; // stop xspeed
             this.ySpeed = this.ySpeed / 5; // slow down y speed (friction)
             this.rot += this.ySpeed / 10; // roll against wall
           } else { //check side of collision step 2
-            this.xPos = walls[a].xPos - (walls[a].size / 2) - (75/2);
+            this.xPos = walls[b].xPos - (walls[b].size / 2) - (75/2);
             this.xSpeed = 0;
             this.ySpeed = this.ySpeed / 5;
             this.rot -= this.ySpeed / 10;
           }
         } else { // check side of collision step 1
           if (!(isPosit(dy))) { // check side of collision step 2
-            this.yPos = walls[a].yPos + (walls[a].size / 2) + (75/2);
+            this.yPos = walls[b].yPos + (walls[b].size / 2) + (75/2);
             this.ySpeed = 0;
             this.xSpeed = this.xSpeed / 5;
             this.rot -= this.xSpeed / 10;
           } else { // check side of collision step 2
-            this.yPos = walls[a].yPos - (walls[a].size / 2) - (75/2);
+            this.yPos = walls[b].yPos - (walls[b].size / 2) - (75/2);
             this.ySpeed = 0;
             this.xSpeed = this.xSpeed / 5;
             this.rot += this.xSpeed / 10;
           }
         }
       }
-      a += 1;
+      b += 1;
     }
     this.xPos += this.xSpeed; // update xpos
     this.yPos += this.ySpeed;
@@ -257,24 +257,28 @@ var Player = new player();
 
 var count = 0;
 
+function playerFire() {
+  if (keyIsDown(32)) { // spacebar
+    if (reload <= 0) {
+      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot) * -20, Math.cos(Player.rot) * 20, 2, [255, 0, 0]);
+      reload = 50;
+    }
+  }
+  if (keyIsDown(16) && keyIsDown(8)) { //shift + backspace
+    if (reload <= 0) {
+      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2, [0, 0, 255]);
+      reload = 10;
+    }
+  }
+}
+
 function draw() {
   create_walls(); // wall algorithim
   if (stage == 0){ // unused
     background(0,0,25,255); // darkblue
     fill(0, 255, 0);
     noStroke();
-    if (keyIsDown(32)) { // spacebar
-      if (reload <= 0) {
-        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot) * -20, Math.cos(Player.rot) * 20, 2, [255, 0, 0]);
-        reload = 50;
-      }
-    }
-    if (keyIsDown(16) && keyIsDown(8)) { //shift + backspace
-      if (reload <= 0) {
-        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2, [0, 0, 255]);
-        reload = 10;
-      }
-    }
+    playerFire();
     a = 0; // bullets tick
     while (a < aBullets.length) {
       aBullets[a].tick();
@@ -283,8 +287,6 @@ function draw() {
     a = 0; // enemies tick/AI
     while (a < enemies.length) {
       enemies[a].ai();
-      console.log("enemy loop:");
-      console.log(a);
       a += 1;
     }
     Player.controls(); // player tick/controls
@@ -300,8 +302,6 @@ function draw() {
     a = 0; // enemies render
     while (a < enemies.length) {
       enemies[a].render();
-      console.log("renderloop:");
-      console.log(a);
       a += 1;
     }
     a = 0; // bullets render
