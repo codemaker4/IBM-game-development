@@ -123,8 +123,13 @@ function enemy(X, Y, HP, REL) {
   this.ai = function() {
     dx = Player.xPos - this.xPos;
     dy = Player.yPos - this.yPos;
-    this.xSpeed += Math.sin(Math.asin(dx / 10000)) * 100;
-    this.ySpeed += Math.cos(Math.acos(dy / 10000)) * 100;
+    if (sqrt((dx*dx)+(dy*dy)) > 200) {
+      this.xSpeed += Math.sin(Math.atan2(dx,dy)) * 1;
+      this.ySpeed += Math.cos(Math.atan2(dx,dy)) * 1;
+    } else {
+      this.xSpeed -= Math.sin(Math.atan2(dx,dy)) * 1;
+      this.ySpeed -= Math.cos(Math.atan2(dx,dy)) * 1;
+    }
     this.xSpeed = this.xSpeed / 1.2;
     this.ySpeed = this.ySpeed / 1.2;
     b = 0;
@@ -137,25 +142,38 @@ function enemy(X, Y, HP, REL) {
           if (!(isPosit(dx))) {
             this.xPos = walls[b].xPos + (walls[b].size / 2) + (this.size/2) + 1;
             this.xSpeed = 0;
-            this.ySpeed = this.ySpeed / 5;
-            this.rot += this.ySpeed / 10;
+            if (isPosit(Player.yPos - this.yPos)) {
+              this.ySpeed += 1;
+            } else {
+              this.ySpeed -= 1;
+            }
           } else {
             this.xPos = walls[b].xPos - (walls[b].size / 2) - (this.size/2) - 1;
             this.xSpeed = 0;
             this.ySpeed = this.ySpeed / 5;
-            this.rot -= this.ySpeed / 10;
+            if (isPosit(Player.yPos - this.yPos)) {
+              this.ySpeed += 1;
+            } else {
+              this.ySpeed -= 1;
+            }
           }
         } else {
           if (!(isPosit(dy))) {
             this.yPos = walls[b].yPos + (walls[b].size / 2) + (this.size/2) + 1;
             this.ySpeed = 0;
-            this.xSpeed = this.xSpeed / 5;
-            this.rot -= this.xSpeed / 10;
+            if (isPosit(Player.xPos - this.xPos)) {
+              this.xSpeed += 1;
+            } else {
+              this.xSpeed -= 1;
+            }
           } else {
             this.yPos = walls[b].yPos - (walls[b].size / 2) - (this.size/2) - 1;
             this.ySpeed = 0;
-            this.xSpeed = this.xSpeed / 5;
-            this.rot += this.xSpeed / 10;
+            if (isPosit(Player.xPos - this.xPos)) {
+              this.xSpeed += 1;
+            } else {
+              this.xSpeed -= 1;
+            }
           }
         }
       }
@@ -193,43 +211,43 @@ function player() {
       this.rot += 0.05;
     }
     if (keyIsDown(87)) { //w
-      this.xSpeed -= Math.sin(this.rot);
-      this.ySpeed += Math.cos(this.rot);
+      this.xSpeed -= Math.sin(this.rot) / 1.5;
+      this.ySpeed += Math.cos(this.rot) / 1.5;
     }
     if (keyIsDown(83)) { //s
-      this.xSpeed += Math.sin(this.rot);
-      this.ySpeed -= Math.cos(this.rot);
+      this.xSpeed += Math.sin(this.rot) / 1.5;
+      this.ySpeed -= Math.cos(this.rot) / 1.5;
     }
-    a = 0;
+    b = 0;
     //hitboxing walls
     while (b < walls.length) {
       dx = walls[b].xPos - this.xPos; // dx = distance X
       dy = walls[b].yPos - this.yPos;
-      if ((posit(dx) < ((walls[b].size / 2) + (75/2))) && (posit(dy) < ((walls[b].size / 2) + (75/2)))) { // if collision
+      if ((posit(dx) < ((walls[b].size / 2) + (70/2))) && (posit(dy) < ((walls[b].size / 2) + (70/2)))) { // if collision
         this.health -= 5;
         if (posit(dx) > posit(dy)) { // check side of collision step 1
           if (!(isPosit(dx))) { // check side of collision step 2
-            this.xPos = walls[b].xPos + (walls[b].size / 2) + (75/2); // do Xpos
+            this.xPos = walls[b].xPos + (walls[b].size / 2) + (70/2); // do Xpos
             this.xSpeed = 0; // stop xspeed
-            this.ySpeed = this.ySpeed / 5; // slow down y speed (friction)
-            this.rot += this.ySpeed / 10; // roll against wall
+//            this.rot += this.ySpeed / 70; // roll against wall
+            this.ySpeed = this.ySpeed / 2; // slow down y speed (friction)
           } else { //check side of collision step 2
-            this.xPos = walls[b].xPos - (walls[b].size / 2) - (75/2);
+            this.xPos = walls[b].xPos - (walls[b].size / 2) - (70/2);
             this.xSpeed = 0;
-            this.ySpeed = this.ySpeed / 5;
-            this.rot -= this.ySpeed / 10;
+//            this.rot -= this.ySpeed / 70;
+            this.ySpeed = this.ySpeed / 2;
           }
         } else { // check side of collision step 1
           if (!(isPosit(dy))) { // check side of collision step 2
-            this.yPos = walls[b].yPos + (walls[b].size / 2) + (75/2);
+            this.yPos = walls[b].yPos + (walls[b].size / 2) + (70/2);
             this.ySpeed = 0;
-            this.xSpeed = this.xSpeed / 5;
-            this.rot -= this.xSpeed / 10;
+//            this.rot -= this.xSpeed / 70;
+            this.xSpeed = this.xSpeed / 2;
           } else { // check side of collision step 2
-            this.yPos = walls[b].yPos - (walls[b].size / 2) - (75/2);
+            this.yPos = walls[b].yPos - (walls[b].size / 2) - (70/2);
             this.ySpeed = 0;
-            this.xSpeed = this.xSpeed / 5;
-            this.rot += this.xSpeed / 10;
+//            this.rot += this.xSpeed / 70;
+            this.xSpeed = this.xSpeed / 2;
           }
         }
       }
