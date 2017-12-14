@@ -20,6 +20,9 @@ var enemies = [];
 var randint;
 var enemyHP = 5;
 var kills = 0;
+var playerMaxHP = 100;
+var score = 0;
+var Hscore = 0;
 
 
 function posit(a) {
@@ -99,13 +102,14 @@ function wall(X,Y,size) {
 }
 
 
-function bullet(X,Y,XS,YS,Damage, COL) {
+function bullet(X,Y,XS,YS,Damage,COL,aType) {
   this.xPos = X;
   this.yPos = Y;
   this.xSpeed = XS;
   this.ySpeed = YS;
   this.Dam = Damage;
   this.color = COL;
+  this.type = aType
   this.tick = function() {
     //move
     this.xPos += this.xSpeed;
@@ -164,7 +168,6 @@ function enemy(X, Y, HP, REL) {
       dx = walls[b].xPos - this.xPos;
       dy = walls[b].yPos - this.yPos;
       if ((posit(dx) < ((walls[b].size / 2) + (this.size/2))) && (posit(dy) < ((walls[b].size / 2) + (this.size/2)))) {
-        this.health -= 5;
         if (posit(dx) > posit(dy)) {
           if (!(isPosit(dx))) {
             this.xPos = walls[b].xPos + (walls[b].size / 2) + (this.size/2) + 1;
@@ -207,18 +210,19 @@ function enemy(X, Y, HP, REL) {
       b += 1;
     }
     if (this.reload <= 0) {
-      aBullets[aBullets.length] = new bullet((Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size + 10)) + this.xPos, (Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size + 10)) + this.yPos, Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, 2, [255, 255, 0]);
+      aBullets[aBullets.length] = new bullet((Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size + 10)) + this.xPos, (Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size + 10)) + this.yPos, Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, 2, [255, 255, 0], 'enemy');
       this.reload = 50;
     }
     b = 0;
     while (b < aBullets.length) {
       dx = aBullets[b].xPos - this.xPos;
       dy = aBullets[b].yPos - this.yPos;
-      if (sqrt((dx*dx)+(dy*dy)) < ((aBullets[b].Dam*5) + this.size)) {
+      if (sqrt((dx*dx)+(dy*dy)) < ((aBullets[b].Dam*5) + this.size) && aBullets[b].type != 'enemy') {
         this.health -= 1;
         if (this.health <= 0) {
           enemies.splice(enemies.indexOf(this), 1);
-          kills += 1
+          kills += 1;
+          score += 50;
           c = Math.ceil(kills / 10);
           while (c > 0) {
             randint = Math.floor(random(0,359));
@@ -242,13 +246,29 @@ function enemy(X, Y, HP, REL) {
 
 enemies = [new enemy(0,0,enemyHP,50)];
 
+function restart() {
+  alert("you lost");
+  walls = []; // lsit with all wall objects
+  aBullets = []; // list with all bullet objects
+  reload = 0; // reload variable, if <= 0 player can fire
+  amount_of_walls_deleted = 0;
+  enemies = [new enemy(0,0,enemyHP,50)];
+  kills = 0;
+  score = 0;
+  Player = new player();
+  for (j = 0; j < aantal_muren; j++){
+    walls[walls.length] = new wall(random(0 - xScreenSize/2, xScreenSize-20), random(0 - yScreenSize/2, yScreenSize-20), 20);
+  }
+}
+
 function player() {
   this.xPos = 100;
   this.yPos = 100;
   this.xSpeed = 0;
   this.ySpeed = 0;
   this.rot = 0;
-  this.health = 100;
+  this.health = playerMaxHP;
+  this.lastHitTime = 0;
   // controls
   this.controls = function() {
     this.rot = atan2((mouseX - (xScreenSize / 2)) * -1,(mouseY - (yScreenSize / 2)) * -1) * -1;
@@ -274,7 +294,10 @@ function player() {
       dx = walls[b].xPos - this.xPos; // dx = distance X
       dy = walls[b].yPos - this.yPos;
       if ((posit(dx) < ((walls[b].size / 2) + (70/2))) && (posit(dy) < ((walls[b].size / 2) + (70/2)))) { // if collision
-        this.health -= 5;
+        if (sqrt((this.xSpeed*this.xSpeed)+(this.ySpeed*this.ySpeed)) > 7) {
+          this.health -= 5;
+          this.lastHitTime = 500;
+        }
         if (posit(dx) > posit(dy)) { // check side of collision step 1
           if (!(isPosit(dx))) { // check side of collision step 2
             this.xPos = walls[b].xPos + (walls[b].size / 2) + (70/2); // do Xpos
@@ -303,6 +326,27 @@ function player() {
       }
       b += 1;
     }
+    b = 0;
+    while (b < aBullets.length) {
+      dx = aBullets[b].xPos - this.xPos;
+      dy = aBullets[b].yPos - this.yPos;
+      if (sqrt((dx*dx)+(dy*dy)) < ((70/2) + (aBullets[b].Dam * 2.5)) && aBullets[b].type != 'player') {
+        aBullets[b].Dam -= 1;
+        this.health -= 1;
+        this.lastHitTime = 500;
+      }
+      b += 1;
+    }
+    if (this.health <= 0) {
+      restart();
+    }
+    if (this.lastHitTime <= 0 && this.health < playerMaxHP) {
+      this.health += 0.25;
+    }
+    if (score > Hscore) {
+      Hscore = score;
+    }
+    this.lastHitTime -= 1;
     this.xPos += this.xSpeed; // update xpos
     this.yPos += this.ySpeed;
     this.xSpeed = this.xSpeed * 0.95; // slow down slightly
@@ -318,6 +362,13 @@ function player() {
     rectMode(CENTER); // image
     image(player_img, -37.5, -37.5, 75, 75); // image
     pop(); // rotation
+    rectMode(CORNER);
+    fill(255,0,0,128);
+    rect(xScreenSize/-2 + 10,yScreenSize/-2 + 10,((xScreenSize-20)/playerMaxHP)*Player.health,yScreenSize/75,20);
+    fill(0,255,0,128);
+    rect(xScreenSize/-2 + 10,yScreenSize/-2 + 20 + (yScreenSize/75),((xScreenSize-20)/Hscore)*score,yScreenSize/75,20);
+    textSize(32);
+    text(score.toString() + '/' + Hscore.toString(),xScreenSize/-2 + 10,yScreenSize/-2 + 40 + ((yScreenSize/75) * 3));
   }
 }
 
@@ -328,13 +379,13 @@ var count = 0;
 function playerFire() {
   if (mouseIsPressed) { // spacebar
     if (reload <= 0) {
-      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + Math.PI) * -20, Math.cos(Player.rot + Math.PI) * 20, 2, [255, 0, 0]);
+      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + Math.PI) * -20, Math.cos(Player.rot + Math.PI) * 20, 2, [255, 0, 0],'player');
       reload = 50;
     }
   }
   if (keyIsDown(16) && keyIsDown(8)) { //shift + backspace
     if (reload <= 0) {
-      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot) * -20, Math.cos(Player.rot) * 20, 2, [255, 0, 0]);
+      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot) * -20, Math.cos(Player.rot) * 20, 5, [255, 0, 0],'player');
       reload = 10;
     }
   }
