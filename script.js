@@ -74,22 +74,35 @@ function wall(X,Y,size) {
 function bullet(X,Y,XS,YS,Damage, COL) {
   this.xPos = X;
   this.yPos = Y;
-  this.ySpeed = XS;
-  this.xSpeed = YS;
+  this.xSpeed = XS;
+  this.ySpeed = YS;
   this.Dam = Damage;
-  this.age = 0;
   this.color = COL;
   this.tick = function() {
     //move
     this.xPos += this.xSpeed;
     this.yPos += this.ySpeed;
     // hitbox walls
+    a = 0;
+    while (a < walls.length) {
+      dx = walls[a].xPos - this.xPos;
+      dy = walls[a].yPos - this.yPos;
+//    Math.sqrt((dx*dx)+(dy*dy)) < ((walls[a].size / 2) + (70/2))
+      if ((posit(dx) < ((walls[a].size / 2) + (this.size/2))) && (posit(dy) < ((walls[a].size / 2) + (this.size/2)))) {
+        walls[a].size -= 1;
+        if (walls[a].size < 1) {
+          walls.splice(a, 1);
+          a -= 1;
+        }
+        this.Dam -= 1;
+      }
+      a += 1;
+    }
     //hitbox enemys
     //hitbox player
     if (this.xPos - cameraX > xScreenSize + xScreenSize || this.xPos - cameraX < 0 - xScreenSize || this.yPos - cameraY > yScreenSize + yScreenSize || this.yPos - cameraY < 0 - yScreenSize){
       aBullets.splice(aBullets.indexOf(this), 1);
     }
-    this.age += 1;
   }
   //render
   this.render = function() {
@@ -118,7 +131,7 @@ function enemy(X, Y, HP, REL) {
       dx = walls[a].xPos - this.xPos;
       dy = walls[a].yPos - this.yPos;
 //    Math.sqrt((dx*dx)+(dy*dy)) < ((walls[a].size / 2) + (70/2))
-      if ((posit(dx) < ((walls[a].size / 2) + (70/2))) && (posit(dy) < ((walls[a].size / 2) + (this.size/2)))) {
+      if ((posit(dx) < ((walls[a].size / 2) + (this.size/2))) && (posit(dy) < ((walls[a].size / 2) + (this.size/2)))) {
         this.health -= 5;
         if (posit(dx) > posit(dy)) {
           if (!(isPosit(dx))) {
@@ -149,7 +162,7 @@ function enemy(X, Y, HP, REL) {
       a += 1;
     }
     if (this.reload <= 0) {
-      aBullets[aBullets.length] = new bullet(this.xPos, this.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2, [255, 255, 0]);
+      aBullets[aBullets.length] = new bullet(this.xPos, this.yPos, Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, 2, [255, 255, 0]);
       this.reload = 50;
     }
     this.xPos += this.xSpeed;
@@ -162,7 +175,7 @@ function enemy(X, Y, HP, REL) {
   }
 }
 
-enemies = [new enemy(0,0,1,50), new enemy(100,100,1,50)];
+enemies = [new enemy(0,0,1,50),new enemy(100,100,1,50)];
 
 function player() {
   this.xPos = 100;
@@ -252,7 +265,7 @@ function draw() {
     noStroke();
     if (keyIsDown(32)) { // spacebar
       if (reload <= 0) {
-        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + (Math.PI / 2)) * 20, Math.cos(Player.rot + (Math.PI / 2)) * 20, 2, [255, 0, 0]);
+        aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot) * -20, Math.cos(Player.rot) * 20, 2, [255, 0, 0]);
         reload = 50;
       }
     }
@@ -270,6 +283,8 @@ function draw() {
     a = 0; // enemies tick/AI
     while (a < enemies.length) {
       enemies[a].ai();
+      console.log("enemy loop:");
+      console.log(a);
       a += 1;
     }
     Player.controls(); // player tick/controls
@@ -285,6 +300,8 @@ function draw() {
     a = 0; // enemies render
     while (a < enemies.length) {
       enemies[a].render();
+      console.log("renderloop:");
+      console.log(a);
       a += 1;
     }
     a = 0; // bullets render
