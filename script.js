@@ -5,6 +5,8 @@ var walls = []; // lsit with all wall objects
 var aBullets = []; // list with all bullet objects
 var player_img; // image of player
 var barricade_img; // image for wall
+var enemy_img; // image for enemy
+var bullet_img;
 var aantal_muren = 30; // aantal muren in het begin
 var a = 0; // loop counter
 var b = 0;
@@ -41,6 +43,8 @@ function setup() {
   createCanvas(xScreenSize, yScreenSize);
   player_img = loadImage("images/pon.png");
   barricade_img = loadImage("images/barriecade.png");
+  enemy_img = loadImage("images/enemy.png");
+  bullet_img = loadImage("images/bullets.png");
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
@@ -140,6 +144,7 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
   this.render = function() {
     fill(this.color);
     ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam * 5,this.Dam * 5);
+    //image(bullet_img, this.xPos - cameraX - this.Dam, this.yPos - cameraY - this.Dam, this.Dam * 2, this.Dam * 2);
   }
 }
 
@@ -217,7 +222,7 @@ function enemy(X, Y, HP, REL) {
     while (b < aBullets.length) {
       dx = aBullets[b].xPos - this.xPos;
       dy = aBullets[b].yPos - this.yPos;
-      if (sqrt((dx*dx)+(dy*dy)) < ((aBullets[b].Dam*5) + this.size) && aBullets[b].type != 'enemy') {
+      if (sqrt((dx*dx)+(dy*dy)) < ((aBullets[b].Dam*10) + this.size) && aBullets[b].type != 'enemy') {
         this.health -= 1;
         if (this.health <= 0) {
           enemies.splice(enemies.indexOf(this), 1);
@@ -239,8 +244,9 @@ function enemy(X, Y, HP, REL) {
     this.reload -= 1;
   }
   this.render = function() {
-    fill(0,0,255,255);
-    ellipse(this.xPos - cameraX,this.yPos - cameraY,this.size,this.size);
+  //  fill(0,0,255,255);
+  //  ellipse(this.xPos - cameraX,this.yPos - cameraY,this.size,this.size);
+    image(enemy_img, (this.xPos - cameraX) - 30, (this.yPos - cameraY) - 30, 60, 60);
   }
 }
 
