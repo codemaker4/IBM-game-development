@@ -16,7 +16,7 @@ var cameraY = 0;
 var i; // loop variable
 var AXSpeed = 0; // average X and Y speed of player
 var AYSpeed = 0;
-var amount_of_walls_dis = 0;
+var amount_of_walls_deleted = 0;
 var enemies = [];
 
 
@@ -41,17 +41,42 @@ function setup() {
 
 function create_walls(){
   i = 0;
-  amount_of_walls_dis = 0;
   while (i < walls.length) {
     if ((walls[i].xPos - cameraX <= -xScreenSize*2) || (walls[i].xPos - cameraX >= xScreenSize + xScreenSize*2) || (walls[i].yPos - cameraY <= -yScreenSize*2) || (walls[i].yPos - cameraY >= yScreenSize + yScreenSize*2)){
-      amount_of_walls_dis += 1;
+      amount_of_walls_deleted += 1;
       walls.splice(i, 1);
       i -= 1;
-      randint = Math.floor(random(0,359));
-      walls[walls.length] = new wall(Math.sin(randint) * 1000 + Player.xPos, Math.cos(randint) * 1000 + Player.yPos, 20);
     }
-    if (amount_of_walls_dis > 0){
-//      console.log(amount_of_walls_dis);
+    if (amount_of_walls_deleted >= 5) {
+//      console.log(amount_of_walls_deleted);
+      randint = Math.floor(random(0,359));
+      this.newX = Math.sin(randint) * 1000 + Player.xPos;
+      this.newY = Math.cos(randint) * 1000 + Player.yPos;
+      this.newDirection = Math.floor(random(0, 4));
+      console.log();
+      b = 0;
+      if (newDirection == 0) {
+        while (b < 5) {
+          walls[walls.length] = new wall(this.newX + (b*20), this.newY, 20);
+          b += 1;
+        }
+      } else if (newDirection == 1) {
+        while (b < 5) {
+          walls[walls.length] = new wall(this.newX + (b*-20), this.newY, 20);
+          b += 1;
+        }
+      } else if (newDirection == 2) {
+        while (b < 5) {
+          walls[walls.length] = new wall(this.newX, this.newY + (b*20), 20);
+          b += 1;
+        }
+      } else {
+        while (b < 5) {
+          walls[walls.length] = new wall(this.newX, this.newY + (b*-20), 20);
+          b += 1;
+        }
+      }
+      amount_of_walls_deleted -= 5;
     }
     i += 1;
   }
