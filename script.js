@@ -15,8 +15,6 @@ var reload = 0; // reload variable, if <= 0 player can fire
 var cameraX = 0; // cameraX and Y, X and Y position of camera.
 var cameraY = 0;
 var i; // loop variable
-var AXSpeed = 0; // average X and Y speed of player
-var AYSpeed = 0;
 var amount_of_walls_deleted = 0;
 var enemies = [];
 var randint;
@@ -253,19 +251,22 @@ function player() {
   this.health = 100;
   // controls
   this.controls = function() {
+    this.rot = atan2((mouseX - (xScreenSize / 2)) * -1,(mouseY - (yScreenSize / 2)) * -1) * -1;
     if (keyIsDown(65)) { //a
-      this.rot -= 0.05;
+      this.xSpeed += Math.sin(this.rot + (Math.PI / 2)) / 1.5;
+      this.ySpeed -= Math.cos(this.rot + (Math.PI / 2)) / 1.5;
     }
     if (keyIsDown(68)) { //d
-      this.rot += 0.05;
+      this.xSpeed += Math.sin(this.rot + (Math.PI / 2)) / 1.5;
+      this.ySpeed -= Math.cos(this.rot + (Math.PI / 2)) / 1.5;
     }
     if (keyIsDown(87)) { //w
-      this.xSpeed -= Math.sin(this.rot) / 1.5;
-      this.ySpeed += Math.cos(this.rot) / 1.5;
-    }
-    if (keyIsDown(83)) { //s
       this.xSpeed += Math.sin(this.rot) / 1.5;
       this.ySpeed -= Math.cos(this.rot) / 1.5;
+    }
+    if (keyIsDown(83)) { //s
+      this.xSpeed -= Math.sin(this.rot) / 1.5;
+      this.ySpeed += Math.cos(this.rot) / 1.5;
     }
     b = 0;
     //hitboxing walls
@@ -325,9 +326,9 @@ var Player = new player();
 var count = 0;
 
 function playerFire() {
-  if (keyIsDown(32)) { // spacebar
+  if (mouseIsPressed) { // spacebar
     if (reload <= 0) {
-      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot) * -20, Math.cos(Player.rot) * 20, 2, [255, 0, 0]);
+      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + Math.PI) * -20, Math.cos(Player.rot + Math.PI) * 20, 2, [255, 0, 0]);
       reload = 50;
     }
   }
@@ -361,10 +362,8 @@ function draw() {
       a += 1;
     }
     Player.controls(); // player tick/controls
-    AXSpeed = (Player.xSpeed + (AXSpeed * 3)) / 4; // average X speed of player, camera
-    AYSpeed = (Player.ySpeed + (AYSpeed * 3)) / 4;
-    cameraX = Player.xPos + (AXSpeed * 10) - (xScreenSize / 2); // camera is set ahead of player based on movement(speed)
-    cameraY = Player.yPos + (AYSpeed * 10) - (yScreenSize / 2);
+    cameraX = Player.xPos - (xScreenSize / 2);
+    cameraY = Player.yPos - (yScreenSize / 2);
     a = 0; // wall render
     while (a < walls.length) {
       walls[a].render();
