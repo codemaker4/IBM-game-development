@@ -25,7 +25,7 @@ var kills = 0;
 var playerMaxHP = 100;
 var score = 0;
 var Hscore = 0;
-
+var difficulty = 1;
 
 function posit(a) {
   return(sqrt(a*a));
@@ -228,8 +228,9 @@ function enemy(X, Y, HP, REL) {
           enemies.splice(enemies.indexOf(this), 1);
           kills += 1;
           score += 50;
-          c = Math.ceil(kills / 10);
-          while (c > 0) {
+          difficulty += 0.1;
+          console.log(toString(Math.floor(difficulty)) + "," + toString(difficulty));
+          while (Math.floor(difficulty) > enemies.length) {
             randint = Math.floor(random(0,359));
             enemies[enemies.length] = new enemy(Math.sin(randint) * 1000 + Player.xPos,Math.cos(randint) * 2000 + Player.yPos,enemyHP,50);
             c -= 1;
@@ -262,6 +263,7 @@ function restart() {
   kills = 0;
   score = 0;
   Player = new player();
+  difficulty = 0;
   for (j = 0; j < aantal_muren; j++){
     walls[walls.length] = new wall(random(0 - xScreenSize/2, xScreenSize-20), random(0 - yScreenSize/2, yScreenSize-20), 20);
   }
@@ -279,8 +281,8 @@ function player() {
   this.controls = function() {
     this.rot = atan2((mouseX - (xScreenSize / 2)) * -1,(mouseY - (yScreenSize / 2)) * -1) * -1;
     if (keyIsDown(65)) { //a
-      this.xSpeed += Math.sin(this.rot + (Math.PI / 2)) / 1.5;
-      this.ySpeed -= Math.cos(this.rot + (Math.PI / 2)) / 1.5;
+      this.xSpeed -= Math.sin(this.rot + (Math.PI / 2)) / 1.5;
+      this.ySpeed += Math.cos(this.rot + (Math.PI / 2)) / 1.5;
     }
     if (keyIsDown(68)) { //d
       this.xSpeed += Math.sin(this.rot + (Math.PI / 2)) / 1.5;
@@ -374,7 +376,7 @@ function player() {
     fill(0,255,0,128);
     rect(xScreenSize/-2 + 10,yScreenSize/-2 + 20 + (yScreenSize/75),((xScreenSize-20)/Hscore)*score,yScreenSize/75,20);
     textSize(32);
-    text(score.toString() + '/' + Hscore.toString(),xScreenSize/-2 + 10,yScreenSize/-2 + 40 + ((yScreenSize/75) * 3));
+    text('Score:' + score.toString() + ' / Highscore:' + Hscore.toString(),xScreenSize/-2 + 10,yScreenSize/-2 + 40 + ((yScreenSize/75) * 3));
   }
 }
 
@@ -383,7 +385,7 @@ var Player = new player();
 var count = 0;
 
 function playerFire() {
-  if (mouseIsPressed) { // spacebar
+  if (mouseIsPressed || keyIsDown(32)) { // spacebar
     if (reload <= 0) {
       aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + Math.PI) * -20, Math.cos(Player.rot + Math.PI) * 20, 2, [255, 0, 0],'player');
       reload = 50;
