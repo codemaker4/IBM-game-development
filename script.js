@@ -26,6 +26,7 @@ var playerMaxHP = 100;
 var score = 0;
 var Hscore = 0;
 var difficulty = 1;
+var particles = [];
 
 function posit(a) {
   return(sqrt(a*a));
@@ -62,7 +63,6 @@ function create_walls(){
       this.newX = Math.sin(randint) * 1000 + Player.xPos;
       this.newY = Math.cos(randint) * 1000 + Player.yPos;
       this.newDirection = Math.floor(random(0, 4));
-      console.log();
       b = 0;
       if (newDirection == 0) {
         while (b < 5) {
@@ -105,6 +105,33 @@ function wall(X,Y,size) {
   }
 }
 
+function particle(xp,yp,xs,ys,col,siz) {
+  this.xPos = xp;
+  this.yPos = yp;
+  this.xSpeed = xs;
+  this.ySpeed = ys;
+  this.color = col;
+  this.size = siz;
+  this.tick = function() {
+    this.xPos += this.xSpeed;
+    this.yPos += this.ySpeed;
+    this.size -= 0.1;
+    if (this.size <= 0) {
+      particles.splice(particles.indexOf(this), 1);
+      a -= 1;
+    }
+  }
+  this.render = function() {
+    fill(this.color);
+    ellipse(this.xPos - cameraX - (xScreenSize/2),this.yPos - cameraY - (yScreenSize/2),round(this.size),round(this.size));
+  }
+}
+
+//var j = 0;
+//while (j < 5) {
+//  particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[0,0,0],10);
+//  j += 1;
+//}
 
 function bullet(X,Y,XS,YS,Damage,COL,aType) {
   this.xPos = X;
@@ -125,12 +152,16 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
       dy = walls[b].yPos - this.yPos;
       if ((posit(dx) < ((walls[b].size / 2) + (this.Dam*2.5))) && (posit(dy) < ((walls[b].size / 2) + (this.Dam*2.5)))) {
         walls[b].size -= 1;
-
         if (walls[b].size < 1) {
+          var j = 0;
+          while (j < 10) {
+            particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[0,255,0],10);
+            j += 1;
+          }
           walls.splice(b, 1);
           b -= 1;
         }
-        this.Dam -= 1;
+        this.Dam -= 3;
       }
       b += 1;
     }
@@ -155,7 +186,7 @@ function enemy(X, Y, HP, REL) {
   this.reload = REL;
   this.xSpeed = 0;
   this.ySpeed = 0;
-  this.size = 30;
+  this.size = 60;
   this.ai = function() {
     dx = Player.xPos - this.xPos;
     dy = Player.yPos - this.yPos;
@@ -224,12 +255,17 @@ function enemy(X, Y, HP, REL) {
       dy = aBullets[b].yPos - this.yPos;
       if (sqrt((dx*dx)+(dy*dy)) < ((aBullets[b].Dam*10) + this.size) && aBullets[b].type != 'enemy') {
         this.health -= 1;
+        particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[255,255,255],5);
         if (this.health <= 0) {
-          enemies.splice(enemies.indexOf(this), 1);
+          var j = 0;
+          while (j < 10) {
+            particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[255,255,255],10);
+            j += 1;
+          }
           kills += 1;
           score += 50;
           difficulty += 0.1;
-          console.log(toString(Math.floor(difficulty)) + "," + toString(difficulty));
+          enemies.splice(enemies.indexOf(this), 1);
           while (Math.floor(difficulty) > enemies.length) {
             randint = Math.floor(random(0,359));
             enemies[enemies.length] = new enemy(Math.sin(randint) * 1000 + Player.xPos,Math.cos(randint) * 2000 + Player.yPos,enemyHP,50);
@@ -281,20 +317,24 @@ function player() {
   this.controls = function() {
     this.rot = atan2((mouseX - (xScreenSize / 2)) * -1,(mouseY - (yScreenSize / 2)) * -1) * -1;
     if (keyIsDown(65)) { //a
-      this.xSpeed -= Math.sin(this.rot + (Math.PI / 2)) / 1.5;
-      this.ySpeed += Math.cos(this.rot + (Math.PI / 2)) / 1.5;
+//      this.xSpeed -= Math.sin(this.rot + (Math.PI / 2)) / 1.5;
+//      this.ySpeed += Math.cos(this.rot + (Math.PI / 2)) / 1.5;
+        this.xSpeed -= 1 / 1.5;
     }
     if (keyIsDown(68)) { //d
-      this.xSpeed += Math.sin(this.rot + (Math.PI / 2)) / 1.5;
-      this.ySpeed -= Math.cos(this.rot + (Math.PI / 2)) / 1.5;
+//      this.xSpeed += Math.sin(this.rot + (Math.PI / 2)) / 1.5;
+//      this.ySpeed -= Math.cos(this.rot + (Math.PI / 2)) / 1.5;
+      this.xSpeed += 1 / 1.5
     }
     if (keyIsDown(87)) { //w
-      this.xSpeed += Math.sin(this.rot) / 1.5;
-      this.ySpeed -= Math.cos(this.rot) / 1.5;
+//      this.xSpeed += Math.sin(this.rot) / 1.5;
+//      this.ySpeed -= Math.cos(this.rot) / 1.5;
+      this.ySpeed -= 1 / 1.5;
     }
     if (keyIsDown(83)) { //s
-      this.xSpeed -= Math.sin(this.rot) / 1.5;
-      this.ySpeed += Math.cos(this.rot) / 1.5;
+//      this.xSpeed -= Math.sin(this.rot) / 1.5;
+//      this.ySpeed += Math.cos(this.rot) / 1.5;
+      this.ySpeed += 1 / 1.5;
     }
     b = 0;
     //hitboxing walls
@@ -303,8 +343,9 @@ function player() {
       dy = walls[b].yPos - this.yPos;
       if ((posit(dx) < ((walls[b].size / 2) + (70/2))) && (posit(dy) < ((walls[b].size / 2) + (70/2)))) { // if collision
         if (sqrt((this.xSpeed*this.xSpeed)+(this.ySpeed*this.ySpeed)) > 7) {
-          this.health -= 5;
+          this.health -= 3;
           this.lastHitTime = 500;
+          particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[255,128,0],10);
         }
         if (posit(dx) > posit(dy)) { // check side of collision step 1
           if (!(isPosit(dx))) { // check side of collision step 2
@@ -342,11 +383,22 @@ function player() {
         aBullets[b].Dam -= 1;
         this.health -= 1;
         this.lastHitTime = 500;
+        particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[255,128,0],10);
       }
       b += 1;
     }
     if (this.health <= 0) {
       restart();
+      var j = 0;
+      while (j < 10) {
+        particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[255,128,0],15);
+        j += 1;
+      }
+      var j = 0;
+      while (j < 10) {
+        particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[255,0,0],15);
+        j += 1;
+      }
     }
     if (this.lastHitTime <= 0 && this.health < playerMaxHP) {
       this.health += 0.25;
@@ -420,6 +472,13 @@ function draw() {
       }
       a += 1;
     }
+    a = 0;
+    while (a < particles.length) {
+      if (particles[a] !== undefined) {
+        particles[a].tick();
+      }
+      a += 1;
+    }
     Player.controls(); // player tick/controls
     cameraX = Player.xPos - (xScreenSize / 2);
     cameraY = Player.yPos - (yScreenSize / 2);
@@ -439,6 +498,11 @@ function draw() {
       a += 1;
     }
     Player.render(); // player renders on top
+    a = 0;
+    while (a < particles.length) {
+      particles[a].render();
+      a += 1
+    }
   }
   count += 1; // keep count of loop (now unused)
   reload -= 1; // reload cooldown, if < 0, the allow fire
