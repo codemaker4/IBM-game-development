@@ -17,7 +17,7 @@ var reload = 0; // reload variable, if <= 0 player can fire
 var cameraX = 0; // cameraX and Y, X and Y position of camera.
 var cameraY = 0;
 var i; // loop variable
-var amount_of_walls_deleted = 0;
+var amount_of_walls_deleted = 50;
 var enemies = [];
 var randint;
 var enemyHP = 5;
@@ -258,12 +258,12 @@ function restart() {
   walls = []; // lsit with all wall objects
   aBullets = []; // list with all bullet objects
   reload = 0; // reload variable, if <= 0 player can fire
-  amount_of_walls_deleted = 0;
+  amount_of_walls_deleted = 50;
   enemies = [new enemy(0,0,enemyHP,50)];
   kills = 0;
   score = 0;
   Player = new player();
-  difficulty = 0;
+  difficulty = 1;
   for (j = 0; j < aantal_muren; j++){
     walls[walls.length] = new wall(random(0 - xScreenSize/2, xScreenSize-20), random(0 - yScreenSize/2, yScreenSize-20), 20);
   }
@@ -311,24 +311,24 @@ function player() {
             this.xPos = walls[b].xPos + (walls[b].size / 2) + (70/2); // do Xpos
             this.xSpeed = 0; // stop xspeed
 //            this.rot += this.ySpeed / 70; // roll against wall
-            this.ySpeed = this.ySpeed / 2; // slow down y speed (friction)
+            this.ySpeed = this.ySpeed / 1; // slow down y speed (friction)
           } else { //check side of collision step 2
             this.xPos = walls[b].xPos - (walls[b].size / 2) - (70/2);
             this.xSpeed = 0;
 //            this.rot -= this.ySpeed / 70;
-            this.ySpeed = this.ySpeed / 2;
+            this.ySpeed = this.ySpeed / 1;
           }
         } else { // check side of collision step 1
           if (!(isPosit(dy))) { // check side of collision step 2
             this.yPos = walls[b].yPos + (walls[b].size / 2) + (70/2);
             this.ySpeed = 0;
 //            this.rot -= this.xSpeed / 70;
-            this.xSpeed = this.xSpeed / 2;
+            this.xSpeed = this.xSpeed / 1;
           } else { // check side of collision step 2
             this.yPos = walls[b].yPos - (walls[b].size / 2) - (70/2);
             this.ySpeed = 0;
 //            this.rot += this.xSpeed / 70;
-            this.xSpeed = this.xSpeed / 2;
+            this.xSpeed = this.xSpeed / 1;
           }
         }
       }
