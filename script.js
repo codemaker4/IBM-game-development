@@ -406,6 +406,9 @@ function player() {
     if (score > Hscore) {
       Hscore = score;
     }
+    if (count%5 == 0) {
+      particles[particles.length] = new particle(Player.xPos + (Math.sin(Player.rot + Math.PI) * 30),Player.yPos + (Math.cos(Player.rot + Math.PI) * -30),random(-0.5,0.5),random(-0.5,0.5),[128,128,255],5);
+    }
     this.lastHitTime -= 1;
     this.xPos += this.xSpeed; // update xpos
     this.yPos += this.ySpeed;
