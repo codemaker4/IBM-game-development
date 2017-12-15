@@ -27,6 +27,15 @@ var score = 0;
 var Hscore = 0;
 var difficulty = 1;
 var particles = [];
+var explosionSound = new Audio('music/Explosion.mp3');
+// explosionSound.play();
+// this.explosionSound = new Audio('music/Explosion.mp3');
+// this.explosionSound.play();
+var lazerSound = new Audio('music/LAZER.mp3');
+// lazerSound.play();
+// this.lazerSound = new Audio('music/LAZER.mp3');
+// this.lazerSound.play();
+
 
 function posit(a) {
   return(sqrt(a*a));
@@ -48,6 +57,21 @@ function setup() {
   bullet_img = loadImage("images/bullets.png");
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
+
+function soundLoud(thisob) {
+  this.dx = thisob.xPos - Player.xPos;
+  this.dy = thisob.yPos - Player.yPos;
+  this.distance = sqrt((dx*dx)+(dy*dy));
+  if (this.distance <= 2000) {
+    return(((this.distance*-1)+2000)/2000);
+  }
+  return(false);
+}
+
+// if (soundLoud(this)) {
+//   explosionSound.volume = soundLoud();
+//   this.explosionSound.play();
+// }
 
 function create_walls(){
   i = 0;
@@ -141,6 +165,14 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
   this.Dam = Damage;
   this.color = COL;
   this.type = aType
+  this.explosionSound = new Audio('music/Explosion.mp3');
+  this.lazerSound = new Audio('music/LAZER.mp3');
+  if (soundLoud(this)) {
+   console.log(lazerSound.volume);
+   lazerSound.volume = soundLoud(this);
+   console.log(lazerSound.volume);
+   this.lazerSound.play();
+  }
   this.tick = function() {
     //move
     this.xPos += this.xSpeed;
@@ -159,6 +191,10 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
             j += 1;
           }
           walls.splice(b, 1);
+          if (soundLoud(this)) {
+           explosionSound.volume = soundLoud(this);
+           this.explosionSound.play();
+          }
           b -= 1;
         }
         this.Dam -= 3;
@@ -290,6 +326,8 @@ function enemy(X, Y, HP, REL) {
 enemies = [new enemy(0,0,enemyHP,50)];
 
 function restart() {
+  explosionSound.volume = 1;
+  explosionSound.play();
   alert("you lost");
   walls = []; // lsit with all wall objects
   aBullets = []; // list with all bullet objects
@@ -448,7 +486,7 @@ function playerFire() {
   }
   if (keyIsDown(16) && keyIsDown(8)) { //shift + backspace
     if (reload <= 0) {
-      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot) * -20, Math.cos(Player.rot) * 20, 5, [255, 0, 0],'player');
+      aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + Math.PI) * -20, Math.cos(Player.rot + Math.PI) * 20, 10, [255, 0, 0],'player');
       reload = 10;
     }
   }
