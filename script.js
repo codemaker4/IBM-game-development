@@ -45,6 +45,14 @@ function isPosit(a) {
   return(a >= 0);
 }
 
+if (typeof(Storage) !== "undefined") {
+    // Retrieve
+    Hscore = localStorage.getItem("Highscore");
+    // Store
+    //localStorage.setItem("Highscore", Hscore);
+} else {
+    Console.log("Can not store to localStorage");
+}
 function setup() {
   // create random walls
   for (j = 0; j < aantal_muren; j++){
@@ -168,9 +176,7 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
   this.explosionSound = new Audio('music/Explosion.mp3');
   this.lazerSound = new Audio('music/LAZER.mp3');
   if (soundLoud(this)) {
-   console.log(lazerSound.volume);
-   lazerSound.volume = soundLoud(this);
-   console.log(lazerSound.volume);
+   lazerSound.volume = soundLoud(this); // sets volume variable correct, but sound.play(); does not react to the vulume?
    this.lazerSound.play();
   }
   this.tick = function() {
@@ -329,6 +335,7 @@ function restart() {
   explosionSound.volume = 1;
   explosionSound.play();
   alert("you lost");
+  localStorage.setItem("Highscore", Hscore);
   walls = []; // lsit with all wall objects
   aBullets = []; // list with all bullet objects
   reload = 0; // reload variable, if <= 0 player can fire
