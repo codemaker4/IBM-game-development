@@ -157,12 +157,6 @@ function particle(xp,yp,xs,ys,col,siz) {
   }
 }
 
-//var j = 0;
-//while (j < 5) {
-//  particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[0,0,0],10);
-//  j += 1;
-//}
-
 function bullet(X,Y,XS,YS,Damage,COL,aType) {
   this.xPos = X;
   this.yPos = Y;
