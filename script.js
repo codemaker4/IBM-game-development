@@ -102,26 +102,16 @@ function create_walls(){
       randint = Math.floor(random(0,359));
       this.newX = Math.sin(randint) * 1000 + Player.xPos;
       this.newY = Math.cos(randint) * 1000 + Player.yPos;
-      this.newDirection = Math.floor(random(0, 4));
+      this.newDirection = Math.floor(random(0, 2));
       b = 0;
       if (newDirection == 0) {
         while (b < 5) {
           walls[walls.length] = new wall(this.newX + (b*20), this.newY, 20);
           b += 1;
         }
-      } else if (newDirection == 1) {
-        while (b < 5) {
-          walls[walls.length] = new wall(this.newX + (b*-20), this.newY, 20);
-          b += 1;
-        }
-      } else if (newDirection == 2) {
-        while (b < 5) {
-          walls[walls.length] = new wall(this.newX, this.newY + (b*20), 20);
-          b += 1;
-        }
       } else {
         while (b < 5) {
-          walls[walls.length] = new wall(this.newX, this.newY + (b*-20), 20);
+          walls[walls.length] = new wall(this.newX, this.newY + (b*20), 20);
           b += 1;
         }
       }
