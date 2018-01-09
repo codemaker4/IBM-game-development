@@ -61,6 +61,11 @@ if (eerder != "ja"){
 }
 Hscore = localStorage.getItem("H_score");
 
+function Onscreen(object, size) {
+  return(object.xPos-cameraX > size*-1 && object.xPos-cameraX < xScreenSize+size && object.yPos-cameraY > size*-1 && object.yPos-cameraY < yScreenSize + size);
+}
+// if (Onscreen(this, 10)) {}
+
 function setup() {
   // create random walls
   for (j = 0; j < aantal_muren; j++){
@@ -124,9 +129,11 @@ function wall(X,Y,size) {
   // hitbox aBullets
   // render
   this.render = function() {
-    rectMode(CENTER);
-    fill(255);
-    image(barricade_img, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, this.size, this.size);
+    if (Onscreen(this, this.size)) {
+      rectMode(CENTER);
+      fill(255);
+      image(barricade_img, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, this.size, this.size);
+    }
   }
 }
 
@@ -147,8 +154,10 @@ function particle(xp,yp,xs,ys,col,siz) {
     }
   }
   this.render = function() {
-    fill(this.color);
-    ellipse(this.xPos - cameraX - (xScreenSize/2),this.yPos - cameraY - (yScreenSize/2),round(this.size),round(this.size));
+    if (Onscreen(this, this.size)) {
+      fill(this.color);
+      ellipse(this.xPos - cameraX - (xScreenSize/2),this.yPos - cameraY - (yScreenSize/2),round(this.size),round(this.size));
+    }
   }
 }
 
@@ -202,9 +211,10 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
   }
   //render
   this.render = function() {
-    fill(this.color);
-    ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam * 5,this.Dam * 5);
-    //image(bullet_img, this.xPos - cameraX - this.Dam, this.yPos - cameraY - this.Dam, this.Dam * 2, this.Dam * 2);
+    if (Onscreen(this, this.Dam*2.5)) {
+      fill(this.color);
+      ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam * 5,this.Dam * 5);
+    }
   }
 }
 
@@ -335,6 +345,7 @@ function restart() {
   for (j = 0; j < aantal_muren; j++){
     walls[walls.length] = new wall(random(0 - xScreenSize/2, xScreenSize-20), random(0 - yScreenSize/2, yScreenSize-20), 20);
   }
+  stage = 1;
 }
 
 function player() {
