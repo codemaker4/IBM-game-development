@@ -37,36 +37,27 @@ var lazerSound = new Audio('music/LAZER.mp3');
 // this.lazerSound.play();
 
 
-function posit(a) {
+function posit(a) { // returns positive version of a (simply remove the - symbol)
   return(sqrt(a*a));
 }
 
-function isPosit(a) {
+function isPosit(a) { // returns true if a is positive (>=0)
   return(a >= 0);
 }
 
-if (typeof(Storage) !== "undefined") {
-    // Retrieve
-    Hscore = localStorage.getItem("Highscore");
-    // Store
-    //localStorage.setItem("Highscore", Hscore);
-} else {
-    Console.log("Can not store to localStorage");
-}
-
-var eerder = localStorage.getItem("eerder");
+var eerder = localStorage.getItem("eerder"); // checks if game was played earlier
 if (eerder != "ja"){
-  localStorage.setItem("eerder", "ja");
+  localStorage.setItem("eerder", "ja"); // set local storage to default
   localStorage.setItem("H_score", 0);
 }
-Hscore = localStorage.getItem("H_score");
+Hscore = localStorage.getItem("H_score"); // gets highscore from localStorage
 
 function Onscreen(object, size) {
   return(object.xPos-cameraX > size*-1 && object.xPos-cameraX < xScreenSize+size && object.yPos-cameraY > size*-1 && object.yPos-cameraY < yScreenSize + size);
 }
 // if (Onscreen(this, 10)) {}
 
-function setup() {
+function setup() { // p5 setup
   // create random walls
   for (j = 0; j < aantal_muren; j++){
     walls[walls.length] = new wall(random(0 - xScreenSize/2, xScreenSize-20), random(0 - yScreenSize/2, yScreenSize-20), 20);
@@ -79,7 +70,7 @@ function setup() {
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
 
-function soundLoud(thisob) {
+function soundLoud(thisob) { // returns the loudness of sounds
   this.dx = thisob.xPos - Player.xPos;
   this.dy = thisob.yPos - Player.yPos;
   this.distance = sqrt((dx*dx)+(dy*dy));
@@ -91,27 +82,27 @@ function soundLoud(thisob) {
 
 function create_walls(){
   i = 0;
-  while (i < walls.length) {
+  while (i < walls.length) { // deletes old walls and counts the deleted walss
     if ((walls[i].xPos - cameraX <= -xScreenSize*2) || (walls[i].xPos - cameraX >= xScreenSize + xScreenSize*2) || (walls[i].yPos - cameraY <= -yScreenSize*2) || (walls[i].yPos - cameraY >= yScreenSize + yScreenSize*2)){
       amount_of_walls_deleted += 1;
       walls.splice(i, 1);
       i -= 1;
     }
-    if (amount_of_walls_deleted >= 5) {
+    if (amount_of_walls_deleted >= 5) { // if 5 walls where deleted, make a new wall
 //      console.log(amount_of_walls_deleted);
       randint = Math.floor(random(0,359));
-      this.newX = Math.sin(randint) * 1000 + Player.xPos;
+      this.newX = Math.sin(randint) * 1000 + Player.xPos; // set new x and y
       this.newY = Math.cos(randint) * 1000 + Player.yPos;
       this.newDirection = Math.floor(random(0, 2));
       b = 0;
-      if (newDirection == 0) {
+      if (newDirection == 0) { // chose direction
         while (b < 5) {
-          walls[walls.length] = new wall(this.newX + (b*20), this.newY, 20);
+          walls[walls.length] = new wall(this.newX + (b*20), this.newY, 20); // create walls
           b += 1;
         }
       } else {
         while (b < 5) {
-          walls[walls.length] = new wall(this.newX, this.newY + (b*20), 20);
+          walls[walls.length] = new wall(this.newX, this.newY + (b*20), 20); // create walls
           b += 1;
         }
       }
@@ -130,8 +121,6 @@ function wall(X,Y,size) {
   // render
   this.render = function() {
     if (Onscreen(this, this.size)) {
-      rectMode(CENTER);
-      fill(255);
       image(barricade_img, this.xPos - (size/2) - cameraX, this.yPos - (size/2) - cameraY, this.size, this.size);
     }
   }
