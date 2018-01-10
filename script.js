@@ -112,6 +112,32 @@ function create_walls(){
   }
 }
 
+function distanceTo(Object1, Object2) {
+  this.x1 = object1.xPos;
+  this.x2 = object2.xPos;
+  this.y1 = object1.yPos;
+  this.y2 = object2.yPos;
+  this.dx = this.x2-this.x1;
+  this.dy = this.y2-this.y1;
+  return(sqrt((dx*dx)+(dy*dy)));
+}
+
+// distanceTo(this, otherObject)
+
+function wallHitbox(object, size) {
+  this.a = 0;
+  this.object = object;
+  this.size = size;
+  while (this.a < walls.length) {
+    if (distanceTo(this.object, walls[this.a]) < this.size + walls[this.a].size) {
+      this.direction = Math.atan2(this.object.xPos - walls[this.a].xPos, this.object.yPos - walls[a].yPos);
+      this.object.xPos += Math.sin(this.direction) * (distanceTo(this.object, walls[this.a])*-1)+(this.size + walls[this.a].size);
+      this.object.yPos += Math.cos(this.direction) * (distanceTo(this.object, walls[this.a])*-1)+(this.size + walls[this.a].size);
+    }
+    this.a += 1;
+  }
+}
+
 function wall(X,Y,size) {
   this.xPos = X;
   this.yPos = Y;
