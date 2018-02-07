@@ -35,6 +35,7 @@ var lazerSound = new Audio('music/LAZER.mp3');
 // lazerSound.play();
 // this.lazerSound = new Audio('music/LAZER.mp3');
 // this.lazerSound.play();
+var tickRate = 50;
 
 
 function posit(a) { // returns positive version of a (simply remove the - symbol)
@@ -73,6 +74,13 @@ function setup() { // p5 setup
   bullet_img = loadImage("images/bullets.png");
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
 }
+
+function ticksPassed(oldDate) {
+  return((new Date().getTime() - oldDate)/1000*tickRate);
+}
+
+// this.oldDate = new Date().getTime();
+// *ticksPassed(this.oldDate)
 
 function soundLoud(thisob) { // returns the loudness of sounds
   this.dx = thisob.xPos - Player.xPos;
@@ -188,6 +196,7 @@ function wall(X,Y,size) {
 }
 
 function particle(xp,yp,xs,ys,col,siz) {
+  this.oldDate = new Date().getTime();
   this.xPos = xp;
   this.yPos = yp;
   this.xSpeed = xs;
@@ -195,9 +204,10 @@ function particle(xp,yp,xs,ys,col,siz) {
   this.color = col;
   this.size = siz;
   this.tick = function() {
-    this.xPos += this.xSpeed;
-    this.yPos += this.ySpeed;
-    this.size -= 0.1;
+    this.xPos += this.xSpeed*ticksPassed(this.oldDate);
+    this.yPos += this.ySpeed*ticksPassed(this.oldDate);
+    this.size -= 0.1*ticksPassed(this.oldDate);
+    this.oldDate = new Date().getTime();
     if (this.size <= 0) {
       particles.splice(particles.indexOf(this), 1);
       a -= 1;
@@ -212,6 +222,7 @@ function particle(xp,yp,xs,ys,col,siz) {
 }
 
 function bullet(X,Y,XS,YS,Damage,COL,aType) {
+  this.oldDate = new Date().getTime();
   this.xPos = X;
   this.yPos = Y;
   this.xSpeed = XS;
@@ -227,8 +238,9 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
   }
   this.tick = function() {
     //move
-    this.xPos += this.xSpeed;
-    this.yPos += this.ySpeed;
+    this.xPos += this.xSpeed*ticksPassed(this.oldDate);
+    this.yPos += this.ySpeed*ticksPassed(this.oldDate);
+    this.oldDate = new Date().getTime();
     // hitbox walls
     if (wallHitbox(this, this.Dam*2.5, 1, false)) { // calling wallhitbox also does the nowmal hitbox stuff.
       this.Dam += -5;
@@ -247,6 +259,7 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
 }
 
 function enemy(X, Y, HP, REL) {
+  this.oldDate = new Date().getTime();
   this.xPos = X;
   this.yPos = Y;
   this.health = HP;
@@ -314,9 +327,10 @@ function enemy(X, Y, HP, REL) {
       }
       b += 1;
     }
-    this.xPos += this.xSpeed;
-    this.yPos += this.ySpeed;
-    this.reload -= 1;
+    this.xPos += this.xSpeed*ticksPassed(this.oldDate);
+    this.yPos += this.ySpeed*ticksPassed(this.oldDate);
+    this.reload -= 1*ticksPassed(this.oldDate);
+    this.oldDate = new Date().getTime();
   }
   this.render = function() {
   //  fill(0,0,255,255);
@@ -348,6 +362,7 @@ function restart() {
 }
 
 function player() {
+  this.oldDate = new Date().getTime();
   this.xPos = 100;
   this.yPos = 100;
   this.xSpeed = 0;
@@ -355,6 +370,7 @@ function player() {
   this.rot = 0;
   this.health = playerMaxHP;
   this.lastHitTime = 0;
+  this.reload = 0;
   // controls
   this.controls = function() {
     this.rot = atan2((mouseX - (xScreenSize / 2)) * -1,(mouseY - (yScreenSize / 2)) * -1) * -1;
@@ -406,9 +422,11 @@ function player() {
     if (count%5 == 0) {
       particles[particles.length] = new particle(Player.xPos + (Math.sin(Player.rot + Math.PI) * 30),Player.yPos + (Math.cos(Player.rot + Math.PI) * -30),random(-0.5,0.5),random(-0.5,0.5),[128,128,255],5);
     }
-    this.lastHitTime -= 1;
-    this.xPos += this.xSpeed; // update xpos
-    this.yPos += this.ySpeed;
+    this.lastHitTime -= 1*ticksPassed(this.oldDate);
+    this.xPos += this.xSpeed*ticksPassed(this.oldDate); // update xpos
+    this.yPos += this.ySpeed*ticksPassed(this.oldDate);
+    this.reload += -1*ticksPassed(this.oldDate);
+    this.oldDate = new Date().getTime();
     this.xSpeed = this.xSpeed * 0.95; // slow down slightly
     this.ySpeed = this.ySpeed * 0.95;
   }
@@ -439,15 +457,15 @@ var count = 0;
 
 function playerFire() {
   if (mouseIsPressed || keyIsDown(32)) { // spacebar
-    if (reload <= 0) {
+    if (Player.reload <= 0) {
       aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + Math.PI) * -20, Math.cos(Player.rot + Math.PI) * 20, 2, [255, 0, 0],'player');
-      reload = 50;
+      Player.reload = 50;
     }
   }
   if (keyIsDown(16) && keyIsDown(8)) { //shift + backspace
-    if (reload <= 0) {
+    if (Player.reload <= 0) {
       aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + Math.PI) * -20, Math.cos(Player.rot + Math.PI) * 20, 10, [255, 0, 0],'player');
-      reload = 10;
+      Player.reload = 10;
     }
   }
 }
@@ -531,5 +549,4 @@ function draw() {
     Pause();
   }
   count += 1; // keep count of loop (now unused)
-  reload -= 1; // reload cooldown, if < 0, the allow fire
 }
