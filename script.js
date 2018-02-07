@@ -64,7 +64,7 @@ function setup() { // p5 setup
   }
   createCanvas(xScreenSize, yScreenSize);
   player_img = loadImage("images/pon.png");
-  barricade_img = loadImage("images/barriecade.png");
+  barricade_img = loadImage("images/barecade/barriecade round.png");
   enemy_img = loadImage("images/enemy.png");
   bullet_img = loadImage("images/bullets.png");
   angleMode(RADIANS); // Change the mode to RADIANS for Math.sin() and Math.cos() witch use radians.
@@ -112,7 +112,7 @@ function create_walls(){
   }
 }
 
-function distanceTo(Object1, Object2) {
+function distanceTo(object1, object2) {
   this.x1 = object1.xPos;
   this.x2 = object2.xPos;
   this.y1 = object1.yPos;
@@ -124,26 +124,41 @@ function distanceTo(Object1, Object2) {
 
 // distanceTo(this, otherObject)
 
-function wallHitbox(object, size) {
-  this.a = 0;
+function wallHitbox(object, size, damage) {
+  this.loopvar = 0;
   this.object = object;
   this.size = size;
-  while (this.a < walls.length) {
-    if (distanceTo(this.object, walls[this.a]) < this.size + walls[this.a].size) {
-      this.direction = Math.atan2(this.object.xPos - walls[this.a].xPos, this.object.yPos - walls[a].yPos);
-      this.object.xPos += Math.sin(this.direction) * (distanceTo(this.object, walls[this.a])*-1)+(this.size + walls[this.a].size);
-      this.object.yPos += Math.cos(this.direction) * (distanceTo(this.object, walls[this.a])*-1)+(this.size + walls[this.a].size);
+  this.damage = damage;
+  while (this.loopvar < walls.length) {
+    if (distanceTo(this.object, walls[this.loopvar]) < this.size + walls[this.loopvar].size/2) {
+      this.direction = Math.atan2(this.object.xPos - walls[this.loopvar].xPos, this.object.yPos - walls[this.loopvar].yPos);
+      this.object.xPos += Math.sin(this.direction) * ((distanceTo(this.object, walls[this.loopvar])-(this.size + walls[this.loopvar].size/2))*-1);
+      this.object.yPos += Math.cos(this.direction) * ((distanceTo(this.object, walls[this.loopvar])-(this.size + walls[this.loopvar].size/2))*-1);
+      this.object.xSpeed = this.object.xSpeed/2;
+      this.object.ySpeed = this.object.ySpeed/2;
+      walls[this.loopvar].health -= this.damage;
+      this.b = this.damage;
+      while (this.b < this.damage) {
+        particles[particles.length] = new particle(walls[this.loopvar].xPos,walls[this.loopvar].yPos,random(-2,2),random(-2,2),[0,255,0],10);
+      }
     }
-    this.a += 1;
+    this.loopvar += 1;
   }
 }
+
+//wallHitbox(this, 10, 0);
 
 function wall(X,Y,size) {
   this.xPos = X;
   this.yPos = Y;
   this.size = size;
-  this.health = 3;
-  // hitbox aBullets
+  this.health = 10;
+  this.tick = function() {
+    if (this.health <= 0) {
+      a -= 1;
+      walls.splice(walls.indexOf(this), 1);
+    }
+  }
   // render
   this.render = function() {
     if (Onscreen(this, this.size)) {
@@ -187,7 +202,7 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
   this.explosionSound = new Audio('music/Explosion.mp3');
   this.lazerSound = new Audio('music/LAZER.mp3');
   if (soundLoud(this)) {
-   lazerSound.volume = soundLoud(this); // sets volume variable correct, but sound.play(); does not react to the vulume?
+   lazerSound.volume = soundLoud(this); // sets volume variable correct, but sound.play(); does not react to the volume?
    this.lazerSound.play();
   }
   this.tick = function() {
@@ -195,31 +210,7 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
     this.xPos += this.xSpeed;
     this.yPos += this.ySpeed;
     // hitbox walls
-    b = 0;
-    while (b < walls.length) {
-      dx = walls[b].xPos - this.xPos;
-      dy = walls[b].yPos - this.yPos;
-      if ((posit(dx) < ((walls[b].size / 2) + (this.Dam*2.5))) && (posit(dy) < ((walls[b].size / 2) + (this.Dam*2.5)))) {
-        walls[b].size -= 1;
-        if (walls[b].size < 1) {
-          var j = 0;
-          while (j < 10) {
-            particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[0,255,0],10);
-            j += 1;
-          }
-          walls.splice(b, 1);
-          if (soundLoud(this)) {
-           explosionSound.volume = soundLoud(this);
-           this.explosionSound.play();
-          }
-          b -= 1;
-        }
-        this.Dam -= 3;
-      }
-      b += 1;
-    }
-    //hitbox enemys
-    //hitbox player
+//    wallHitbox(this, 10, 1);
     if (this.xPos - cameraX > xScreenSize + xScreenSize || this.xPos - cameraX < 0 - xScreenSize || this.yPos - cameraY > yScreenSize + yScreenSize || this.yPos - cameraY < 0 - yScreenSize || this.Dam <= 0){
       aBullets.splice(aBullets.indexOf(this), 1);
     }
@@ -242,62 +233,33 @@ function enemy(X, Y, HP, REL) {
   this.ySpeed = 0;
   this.size = 60;
   this.ai = function() {
-    dx = Player.xPos - this.xPos;
+    dx = Player.xPos - this.xPos; // check player distance
     dy = Player.yPos - this.yPos;
-    if (sqrt((dx*dx)+(dy*dy)) > 200) {
-      this.xSpeed += Math.sin(Math.atan2(dx,dy)) * 1;
+    if (sqrt((dx*dx)+(dy*dy)) > 200) { // if far from player:
+      this.xSpeed += Math.sin(Math.atan2(dx,dy)) * 1; // go to player
       this.ySpeed += Math.cos(Math.atan2(dx,dy)) * 1;
-    } else {
-      this.xSpeed -= Math.sin(Math.atan2(dx,dy)) * 1;
-      this.ySpeed -= Math.cos(Math.atan2(dx,dy)) * 1;
+    } else {                            // esle:
+      this.xSpeed += Math.sin(Math.atan2(dx,dy)+(Math.PI/2)) * 1; // circle around player
+      this.ySpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
     }
-    this.xSpeed = this.xSpeed / 1.2;
+    this.xSpeed = this.xSpeed / 1.2; // slow down
     this.ySpeed = this.ySpeed / 1.2;
-    b = 0;
-    while (b < walls.length) {
-      dx = walls[b].xPos - this.xPos;
-      dy = walls[b].yPos - this.yPos;
-      if ((posit(dx) < ((walls[b].size / 2) + (this.size/2))) && (posit(dy) < ((walls[b].size / 2) + (this.size/2)))) {
-        if (posit(dx) > posit(dy)) {
-          if (!(isPosit(dx))) {
-            this.xPos = walls[b].xPos + (walls[b].size / 2) + (this.size/2) + 1;
-            this.xSpeed = 0;
-            if (isPosit(Player.yPos - this.yPos)) {
-              this.ySpeed += 1;
-            } else {
-              this.ySpeed -= 1;
-            }
-          } else {
-            this.xPos = walls[b].xPos - (walls[b].size / 2) - (this.size/2) - 1;
-            this.xSpeed = 0;
-            this.ySpeed = this.ySpeed / 5;
-            if (isPosit(Player.yPos - this.yPos)) {
-              this.ySpeed += 1;
-            } else {
-              this.ySpeed -= 1;
-            }
-          }
-        } else {
-          if (!(isPosit(dy))) {
-            this.yPos = walls[b].yPos + (walls[b].size / 2) + (this.size/2) + 1;
-            this.ySpeed = 0;
-            if (isPosit(Player.xPos - this.xPos)) {
-              this.xSpeed += 1;
-            } else {
-              this.xSpeed -= 1;
-            }
-          } else {
-            this.yPos = walls[b].yPos - (walls[b].size / 2) - (this.size/2) - 1;
-            this.ySpeed = 0;
-            if (isPosit(Player.xPos - this.xPos)) {
-              this.xSpeed += 1;
-            } else {
-              this.xSpeed -= 1;
-            }
-          }
-        }
+    wallHitbox(this, this.size/2, 0); // wall hitbox
+    this.b = 0; // setup for go away from closest wall
+    this.distanceToWall = 100; //max distance from wall
+    this.closestWall = false;  // true if any wall is the closest
+    while (this.b < walls.length) {
+      if (distanceTo(this, walls[this.b]) < this.distanceToWall) { // check if this wall is closest
+        this.closestWall = this.b; // remember new id
+        this.distanceToWall = distanceTo(this, walls[this.b]); // save distance
       }
-      b += 1;
+      this.b += 1;
+    }
+    if (this.closestWall !== false) { // if any wall found
+      dx = walls[this.closestWall].xPos - this.xPos; // calc distance
+      dy = walls[this.closestWall].yPos - this.yPos;
+      this.xSpeed += Math.sin(Math.atan2(dx,dy)+(Math.PI/2)) * 1; // move away from wall
+      this.ySpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
     }
     if (this.reload <= 0) {
       aBullets[aBullets.length] = new bullet((Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size + 10)) + this.xPos, (Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size + 10)) + this.yPos, Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, 2, [255, 255, 0], 'enemy');
@@ -386,44 +348,8 @@ function player() {
     if (keyIsDown(83)) { //s
       this.ySpeed += 1 / 1.5;
     }
-    b = 0;
     //hitboxing walls
-    while (b < walls.length) {
-      dx = walls[b].xPos - this.xPos; // dx = distance X
-      dy = walls[b].yPos - this.yPos;
-      if ((posit(dx) < ((walls[b].size / 2) + (70/2))) && (posit(dy) < ((walls[b].size / 2) + (70/2)))) { // if collision
-        if (sqrt((this.xSpeed*this.xSpeed)+(this.ySpeed*this.ySpeed)) > 7) {
-          this.health -= 3;
-          this.lastHitTime = 500;
-          particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[255,128,0],10);
-        }
-        if (posit(dx) > posit(dy)) { // check side of collision step 1
-          if (!(isPosit(dx))) { // check side of collision step 2
-            this.xPos = walls[b].xPos + (walls[b].size / 2) + (70/2); // do Xpos
-            this.xSpeed = 0; // stop xspeed
-            this.ySpeed = this.ySpeed / 1; // slow down y speed (friction)
-          } else { //check side of collision step 2
-            this.xPos = walls[b].xPos - (walls[b].size / 2) - (70/2);
-            this.xSpeed = 0;
-//            this.rot -= this.ySpeed / 70;
-            this.ySpeed = this.ySpeed / 1;
-          }
-        } else { // check side of collision step 1
-          if (!(isPosit(dy))) { // check side of collision step 2
-            this.yPos = walls[b].yPos + (walls[b].size / 2) + (70/2);
-            this.ySpeed = 0;
-//            this.rot -= this.xSpeed / 70;
-            this.xSpeed = this.xSpeed / 1;
-          } else { // check side of collision step 2
-            this.yPos = walls[b].yPos - (walls[b].size / 2) - (70/2);
-            this.ySpeed = 0;
-//            this.rot += this.xSpeed / 70;
-            this.xSpeed = this.xSpeed / 1;
-          }
-        }
-      }
-      b += 1;
-    }
+    wallHitbox(this, 35, 0);
     b = 0;
     while (b < aBullets.length) {
       dx = aBullets[b].xPos - this.xPos;
@@ -541,6 +467,13 @@ function draw() {
     while (a < particles.length) {
       if (particles[a] !== undefined) {
         particles[a].tick();
+      }
+      a += 1;
+    }
+    a = 0;
+    while (a < walls.length) {
+      if (walls[a] !== undefined) {
+        walls[a].tick();
       }
       a += 1;
     }
