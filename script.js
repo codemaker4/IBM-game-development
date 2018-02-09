@@ -76,7 +76,10 @@ function setup() { // p5 setup
 }
 
 function ticksPassed(oldDate) {
-  return((new Date().getTime() - oldDate)/1000*tickRate);
+  if ((new Date().getTime() - oldDate)/1000*tickRate < 10) { // no lag detection
+    return((new Date().getTime() - oldDate)/1000*tickRate);
+  }
+  return(1); // in extreme lag situations
 }
 
 // this.oldDate = new Date().getTime();
