@@ -36,6 +36,7 @@ var lazerSound = new Audio('music/LAZER.mp3');
 // this.lazerSound = new Audio('music/LAZER.mp3');
 // this.lazerSound.play();
 var tickRate = 50;
+var itemTypes  = ['Iron','White Enemy Splat','Better Rocket Fuel'];
 
 
 function posit(a) { // returns positive version of a (simply remove the - symbol)
@@ -57,6 +58,10 @@ function Onscreen(object, size) {
   return(object.xPos-cameraX > size*-1 && object.xPos-cameraX < xScreenSize+size && object.yPos-cameraY > size*-1 && object.yPos-cameraY < yScreenSize + size);
 }
 // if (Onscreen(this, 10)) {}
+
+function canUpgrade(upgradeType) {
+
+}
 
 function setup() { // p5 setup
   // create random walls
@@ -206,11 +211,9 @@ function particle(xp,yp,xs,ys,col,siz) {
   this.ySpeed = ys;
   this.color = col;
   this.size = siz;
+  this.oldGameTime = new Date().getTime();
   this.tick = function() {
-    this.xPos += this.xSpeed*ticksPassed(this.oldDate);
-    this.yPos += this.ySpeed*ticksPassed(this.oldDate);
-    this.size -= 0.1*ticksPassed(this.oldDate);
-    this.oldDate = new Date().getTime();
+    this.size -= 0.1;
     if (this.size <= 0) {
       particles.splice(particles.indexOf(this), 1);
       a -= 1;
@@ -220,12 +223,14 @@ function particle(xp,yp,xs,ys,col,siz) {
     if (Onscreen(this, this.size)) {
       fill(this.color);
       ellipse(this.xPos - cameraX - (xScreenSize/2),this.yPos - cameraY - (yScreenSize/2),round(this.size),round(this.size));
+      this.xPos += this.xSpeed*ticksPassed(this.oldGameTime);
+      this.yPos += this.ySpeed*ticksPassed(this.oldGameTime);
+      this.oldGameTime = new Date().getTime();
     }
   }
 }
 
 function bullet(X,Y,XS,YS,Damage,COL,aType) {
-  this.oldDate = new Date().getTime();
   this.xPos = X;
   this.yPos = Y;
   this.xSpeed = XS;
@@ -235,15 +240,12 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
   this.type = aType
   this.explosionSound = new Audio('music/Explosion.mp3');
   this.lazerSound = new Audio('music/LAZER.mp3');
+  this.oldGameTime = new Date().getTime();
   if (soundLoud(this)) {
    lazerSound.volume = soundLoud(this); // sets volume variable correct, but sound.play(); does not react to the volume?
    this.lazerSound.play();
   }
   this.tick = function() {
-    //move
-    this.xPos += this.xSpeed*ticksPassed(this.oldDate);
-    this.yPos += this.ySpeed*ticksPassed(this.oldDate);
-    this.oldDate = new Date().getTime();
     // hitbox walls
     if (wallHitbox(this, this.Dam*2.5, 1, false)) { // calling wallhitbox also does the nowmal hitbox stuff.
       this.Dam += -5;
@@ -257,12 +259,15 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
     if (Onscreen(this, this.Dam*2.5)) {
       fill(this.color);
       ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam * 5,this.Dam * 5);
+      // move
+      this.xPos += this.xSpeed*ticksPassed(this.oldGameTime);
+      this.yPos += this.ySpeed*ticksPassed(this.oldGameTime);
+      this.oldGameTime = new Date().getTime();
     }
   }
 }
 
 function enemy(X, Y, HP, REL) {
-  this.oldDate = new Date().getTime();
   this.xPos = X;
   this.yPos = Y;
   this.health = HP;
@@ -270,6 +275,7 @@ function enemy(X, Y, HP, REL) {
   this.xSpeed = 0;
   this.ySpeed = 0;
   this.size = 60;
+  this.oldGameTime = new Date().getTime();
   this.ai = function() {
     dx = Player.xPos - this.xPos; // check player distance
     dy = Player.yPos - this.yPos;
@@ -300,14 +306,14 @@ function enemy(X, Y, HP, REL) {
       this.ySpeed += Math.cos(Math.atan2(dx,dy)+(Math.PI/2)) * 1;
     }
     if (this.reload <= 0) {
-      aBullets[aBullets.length] = new bullet((Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size + 10)) + this.xPos, (Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size + 10)) + this.yPos, Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, 2, [255, 255, 0], 'enemy');
+      aBullets[aBullets.length] = new bullet((Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size/2 + 10)) + this.xPos, (Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * (this.size/2 + 10)) + this.yPos, Math.sin(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, Math.cos(Math.atan2(Player.xPos - this.xPos, Player.yPos - this.yPos)) * 20, 2, [255, 255, 0], 'enemy');
       this.reload = 50;
     }
     b = 0;
     while (b < aBullets.length) {
       dx = aBullets[b].xPos - this.xPos;
       dy = aBullets[b].yPos - this.yPos;
-      if (sqrt((dx*dx)+(dy*dy)) < ((aBullets[b].Dam*10) + this.size) && aBullets[b].type != 'enemy') {
+      if (sqrt((dx*dx)+(dy*dy)) < ((aBullets[b].Dam*10) + this.size/2) && aBullets[b].type != 'enemy') {
         this.health -= 1;
         particles[particles.length] = new particle(this.xPos,this.yPos,random(-2,2),random(-2,2),[255,255,255],5);
         if (this.health <= 0) {
@@ -330,21 +336,23 @@ function enemy(X, Y, HP, REL) {
       }
       b += 1;
     }
-    this.xPos += this.xSpeed*ticksPassed(this.oldDate);
-    this.yPos += this.ySpeed*ticksPassed(this.oldDate);
-    this.reload -= 1*ticksPassed(this.oldDate);
-    this.oldDate = new Date().getTime();
+    this.reload -= 1;
   }
   this.render = function() {
   //  fill(0,0,255,255);
   //  ellipse(this.xPos - cameraX,this.yPos - cameraY,this.size,this.size);
     image(enemy_img, (this.xPos - cameraX) - 30, (this.yPos - cameraY) - 30, 60, 60);
+    // move
+    this.xPos += this.xSpeed*ticksPassed(this.oldGameTime);
+    this.yPos += this.ySpeed*ticksPassed(this.oldGameTime);
+    this.oldGameTime = new Date().getTime();
   }
 }
 
 enemies = [new enemy(0,0,enemyHP,50)];
 
 function restart() {
+  gameTickCount = 0;
   explosionSound.volume = 1;
   explosionSound.play();
   alert("you lost");
@@ -365,7 +373,6 @@ function restart() {
 }
 
 function player() {
-  this.oldDate = new Date().getTime();
   this.xPos = 100;
   this.yPos = 100;
   this.xSpeed = 0;
@@ -374,20 +381,34 @@ function player() {
   this.health = playerMaxHP;
   this.lastHitTime = 0;
   this.reload = 0;
+  this.speed = 0.5;
+  this.reloadTime = 50;
+  this.inventorySlotCount = 1;
+  this.inventoryCount = [0];
+  this.inventoryType = [''];
+  this.oldGameTime = new Date().getTime();
   // controls
   this.controls = function() {
     this.rot = atan2((mouseX - (xScreenSize / 2)) * -1,(mouseY - (yScreenSize / 2)) * -1) * -1;
     if (keyIsDown(65)) { //a
-        this.xSpeed -= 1 / 1.5;
+        this.xSpeed -= this.speed;
     }
     if (keyIsDown(68)) { //d
-      this.xSpeed += 1 / 1.5
+      this.xSpeed += this.speed;
     }
     if (keyIsDown(87)) { //w
-      this.ySpeed -= 1 / 1.5;
+      this.ySpeed -= this.speed;
     }
     if (keyIsDown(83)) { //s
-      this.ySpeed += 1 / 1.5;
+      this.ySpeed += this.speed;
+    }
+    if (keyIsDown(67)) {
+      stage = 2;
+      background(0,0,25,200);
+    }
+    if (keyIsDown(27)) {
+      stage = 1;
+      background(0,0,25,200);
     }
     //hitboxing walls
     wallHitbox(this, 35, 0, true);
@@ -425,11 +446,8 @@ function player() {
     if (count%5 == 0) {
       particles[particles.length] = new particle(Player.xPos + (Math.sin(Player.rot + Math.PI) * 30),Player.yPos + (Math.cos(Player.rot + Math.PI) * -30),random(-0.5,0.5),random(-0.5,0.5),[128,128,255],5);
     }
-    this.lastHitTime -= 1*ticksPassed(this.oldDate);
-    this.xPos += this.xSpeed*ticksPassed(this.oldDate); // update xpos
-    this.yPos += this.ySpeed*ticksPassed(this.oldDate);
-    this.reload += -1*ticksPassed(this.oldDate);
-    this.oldDate = new Date().getTime();
+    this.lastHitTime -= 1;
+    this.reload += -1;
     this.xSpeed = this.xSpeed * 0.95; // slow down slightly
     this.ySpeed = this.ySpeed * 0.95;
   }
@@ -451,18 +469,24 @@ function player() {
     textSize(32);
     textAlign(LEFT);
     text('Score:' + score.toString() + ' / Highscore:' + Hscore.toString(),xScreenSize/-2 + 10,yScreenSize/-2 + 40 + ((yScreenSize/75) * 3));
+    // move
+    this.xPos += this.xSpeed*ticksPassed(this.oldGameTime); // update xpos
+    this.yPos += this.ySpeed*ticksPassed(this.oldGameTime);
+    this.oldGameTime = new Date().getTime();
   }
 }
 
 var Player = new player();
 
 var count = 0;
+var gameTickCount = 0;
+var oldGameTime = new Date().getTime();
 
 function playerFire() {
-  if (mouseIsPressed || keyIsDown(32)) { // spacebar
+  if (mouseIsPressed) {
     if (Player.reload <= 0) {
       aBullets[aBullets.length] = new bullet(Player.xPos, Player.yPos, Math.sin(Player.rot + Math.PI) * -20, Math.cos(Player.rot + Math.PI) * 20, 2, [255, 0, 0],'player');
-      Player.reload = 50;
+      Player.reload = Player.reloadTime;
     }
   }
   if (keyIsDown(16) && keyIsDown(8)) { //shift + backspace
@@ -476,7 +500,7 @@ function playerFire() {
 function Pause() {
   textAlign(CENTER);
   textSize(32);
-  fill(255,255,255,255)
+  fill(127,255,127);
   text('PAUSED', xScreenSize/2, yScreenSize/2);
   textSize(16);
   text('Press SPACE to continue.', xScreenSize/2, (yScreenSize/2)+100);
@@ -485,71 +509,102 @@ function Pause() {
   }
 }
 
+function CraftMenu() {
+  textAlign(LEFT);
+  fill(127,255,127);
+  textSize(20);
+  this.textY = 25;
+  for (i = 0; i < Player.inventoryType.length; i++) {
+    text(Player.inventoryType[i] + ':' + Player.inventoryCount[i].toString(),0,this.textY);
+    this.textY -= 30;
+  }
+  textAlign(CENTER);
+  text('Presst SPACE to go back to game',xScreenSize/2,yScreenSize-50);
+  if (keyIsDown(32)) {
+    stage = 0;
+  }
+}
+
+function gameTick() {
+  noStroke();
+  playerFire();
+  a = 0; // bullets tick
+  while (a < aBullets.length) {
+    if (aBullets[a] !== undefined) {
+      aBullets[a].tick();
+    }
+    a += 1;
+  }
+  a = 0; // enemies tick/AI
+  while (a < enemies.length) {
+    if (enemies[a] !== undefined) {
+      enemies[a].ai();
+    }
+    a += 1;
+  }
+  a = 0;
+  while (a < particles.length) {
+    if (particles[a] !== undefined) {
+      particles[a].tick();
+    }
+    a += 1;
+  }
+  a = 0;
+  while (a < walls.length) {
+    if (walls[a] !== undefined) {
+      walls[a].tick();
+    }
+    a += 1;
+  }
+  Player.controls(); // player tick/controls
+  gameTickCount += 1;
+}
+
+function gameRender() {
+  background(0,0,25,255); // darkblue
+  cameraX = Player.xPos - (xScreenSize / 2);
+  cameraY = Player.yPos - (yScreenSize / 2);
+  a = 0; // wall render
+  while (a < walls.length) {
+    walls[a].render();
+    a += 1;
+  }
+  a = 0; // enemies render
+  while (a < enemies.length) {
+    enemies[a].render();
+    a += 1;
+  }
+  a = 0; // bullets render
+  while (a < aBullets.length) {
+    aBullets[a].render();
+    a += 1;
+  }
+  Player.render(); // player renders on top
+  a = 0;
+  while (a < particles.length) {
+    particles[a].render();
+    a += 1;
+  }
+}
+
+// this.oldGameTime = new Date().getTime();
+// *ticksPassed(this.oldGameTime)
+
 function draw() {
   create_walls(); // wall algorithim
   if (stage == 0){ // ingame
-    background(0,0,25,255); // darkblue
-    fill(0, 255, 0);
-    noStroke();
-    playerFire();
-    a = 0; // bullets tick
-    while (a < aBullets.length) {
-      if (aBullets[a] !== undefined) {
-        aBullets[a].tick();
-      }
-      a += 1;
+    if (ticksPassed(oldGameTime) >= 1) {
+      gameTick();
+      gameTickCount += 1;
+      oldGameTime = new Date().getTime();
     }
-    a = 0; // enemies tick/AI
-    while (a < enemies.length) {
-      if (enemies[a] !== undefined) {
-        enemies[a].ai();
-      }
-      a += 1;
+    if (stage == 0) { // check if stage changed
+      gameRender();
     }
-    a = 0;
-    while (a < particles.length) {
-      if (particles[a] !== undefined) {
-        particles[a].tick();
-      }
-      a += 1;
-    }
-    a = 0;
-    while (a < walls.length) {
-      if (walls[a] !== undefined) {
-        walls[a].tick();
-      }
-      a += 1;
-    }
-    Player.controls(); // player tick/controls
-    cameraX = Player.xPos - (xScreenSize / 2);
-    cameraY = Player.yPos - (yScreenSize / 2);
-    a = 0; // wall render
-    while (a < walls.length) {
-      walls[a].render();
-      a += 1;
-    }
-    a = 0; // enemies render
-    while (a < enemies.length) {
-      enemies[a].render();
-      a += 1;
-    }
-    a = 0; // bullets render
-    while (a < aBullets.length) {
-      aBullets[a].render();
-      a += 1;
-    }
-    Player.render(); // player renders on top
-    a = 0;
-    while (a < particles.length) {
-      particles[a].render();
-      a += 1
-    }
-    if (keyIsDown(27)) {
-      stage = 1;
-      background(0,0,25,200); // dark blue, slowly fading old ingame frame away.
-    }
-  } else if (stage == 1){ // paused/menu
+  } else if (stage == 1) { // paused/menu
     Pause();
+  } else if (stage == 2) { // craft menu
+    CraftMenu();
   }
-  count += 1; // keep count of loop (now unused)
+  count += 1; // keeps count of the amount of ticks that have passed
 }
