@@ -37,8 +37,10 @@ var lazerSound = new Audio('music/LAZER.mp3');
 // this.lazerSound.play();
 var tickRate = 50;
 var moveSpeed = 1;// *moveSpeed
-var itemTypes  = ['Iron','White Enemy Splat','Better Rocket Fuel'];
-var allObjects = [[],[],[],[]]; // [walls,bullets,enemies,particles]
+var itemTypes  = ['Iron','White Enemy Splat','Empty Tank','Rocket Fuel Tank','Better Rocket Fuel Tank'];
+var itemTextures = [[loadImage("images/items/Iron.png")],[loadImage("images/items/Splat.png")],[loadImage("images/items/empty tank.png")],[loadImage("images/items/fuel tank/fuel tank5.png"),loadImage("images/items/fuel tank/fuel tank4.png"),loadImage("images/items/fuel tank/fuel tank3.png"),loadImage("images/items/fuel tank/fuel tank2.png"),loadImage("images/items/fuel tank/fuel tank1.png"),loadImage("images/items/fuel tank/fuel tank0.png")]]
+var allObjects = [[],[],[],[],[]]; // [walls,bullets,enemies,particles,items]
+var maxItemStack = 50;
 
 
 function posit(a) { // returns positive version of a (simply remove the - symbol)
@@ -60,10 +62,6 @@ function Onscreen(object, mySize) {
   return(object.xPos-cameraX > mySize*-1 && object.xPos-cameraX < xScreenSize+mySize && object.yPos-cameraY > mySize*-1 && object.yPos-cameraY < yScreenSize + mySize);
 }
 // if (Onscreen(this, 10)) {}
-
-function canUpgrade(upgradeType) {
-
-}
 
 function setTickRate(newTickRate) {
   tickRate = newTickRate;
@@ -207,6 +205,31 @@ function wall(X,Y,mySize) {
         image(barricade1, this.xPos - (mySize/2) - cameraX, this.yPos - (mySize/2) - cameraY, this.mySize, this.mySize);
       } // if health is 0, wall will not be renderd
     }
+  }
+}
+
+function groundItem(xPos,yPos,type,amount) {
+  this.xPos = xPos;
+  this.yPos = yPos;
+  this.type = type;
+  this.amount = amount;
+  this.texture =
+  this.tick = function() {
+    this.loopvar = 0;
+    while (this.loopvar < allObjects[4].length) {
+      if (allObjects[4][this.loopvar] != this) {
+        if (distanceTo(this,allObjects[4][this.loopvar]) < 20) {
+          if (this.amount + allObjects[4][this.loopvar].amount < maxItemStack) {
+            this.amount += allObjects[4][this.loopvar].amount;
+            allObjects[4].splice(this.loopvar,1);
+          }
+        }
+      }
+      this.loopvar += 1;
+    }
+  }
+  this.render = function() {
+
   }
 }
 
