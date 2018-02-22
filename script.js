@@ -288,13 +288,13 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
   }
   //render
   this.render = function() {
+    // move
+    this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
+    this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
+    this.oldGameTime = new Date().getTime();
     if (Onscreen(this, this.Dam*2.5)) {
       fill(this.color);
       ellipse(this.xPos - cameraX,this.yPos - cameraY,this.Dam * 5,this.Dam * 5);
-      // move
-      this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
-      this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
-      this.oldGameTime = new Date().getTime();
     }
   }
 }
