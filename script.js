@@ -222,13 +222,13 @@ function particle(xp,yp,xs,ys,col,siz) {
     }
   }
   this.render = function() {
+    this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
+    this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
+    this.oldGameTime = new Date().getTime();
     if (Onscreen(this, this.mySize)) {
       fill(this.color);
       ellipse(this.xPos - cameraX,this.yPos - cameraY,this.mySize,this.mySize);
 // ellipse(this.xPos - cameraX - (xScreenSize/2),this.yPos - cameraY - (yScreenSize/2),round(this.mySize),round(this.mySize)); suddenly stopped working?????
-      this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
-      this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
-      this.oldGameTime = new Date().getTime();
     }
   }
 }
@@ -350,13 +350,13 @@ function enemy(X, Y, HP, REL) {
     this.reload -= 1;
   }
   this.render = function() {
-  //  fill(0,0,255,255);
-  //  ellipse(this.xPos - cameraX,this.yPos - cameraY,this.mySize,this.mySize);
-    image(enemy_img, (this.xPos - cameraX) - 30, (this.yPos - cameraY) - 30, 60, 60);
     // move
     this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
     this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
     this.oldGameTime = new Date().getTime();
+    if (Onscreen(this, 30)) {
+      image(enemy_img, (this.xPos - cameraX) - 30, (this.yPos - cameraY) - 30, 60, 60);
+    }
   }
 }
 
@@ -412,10 +412,6 @@ function player() {
     }
     if (keyIsDown(83)) { //s
       this.ySpeed += this.speed;
-    }
-    if (keyIsDown(67)) {
-      stage = 2;
-      background(0,0,25,200);
     }
     if (keyIsDown(27)) {
       stage = 1;
@@ -586,8 +582,6 @@ function draw() {
     }
   } else if (stage == 1) { // paused/menu
     Pause();
-  } else if (stage == 2) { // craft menu
-    CraftMenu();
   }
   count += 1; // keeps count of the amount of ticks that have passed
 }
