@@ -1,8 +1,6 @@
 var xScreenSize = innerWidth - 5; // canvas size
 var yScreenSize = innerHeight - 5;
 var stage = 0; // 0 = ingame
-var walls = []; // lsit with all wall objects
-var aBullets = []; // list with all bullet objects
 var player_img; // image of player
 var barricade_img; // image for wall
 var enemy_img; // image for enemy
@@ -17,7 +15,6 @@ var cameraX = 0; // cameraX and Y, X and Y position of camera.
 var cameraY = 0;
 var i; // loop variable
 var amount_of_walls_deleted = 50;
-var enemies = [];
 var randint;
 var enemyHP = 4;
 var kills = 0;
@@ -25,19 +22,11 @@ var playerMaxHP = 100;
 var score = 0;
 var Hscore = 0;
 var difficulty = 1;
-var particles = [];
 var explosionSound = new Audio('music/Explosion.mp3');
-// explosionSound.play();
-// this.explosionSound = new Audio('music/Explosion.mp3');
-// this.explosionSound.play();
 var lazerSound = new Audio('music/LAZER.mp3');
-// lazerSound.play();
-// this.lazerSound = new Audio('music/LAZER.mp3');
-// this.lazerSound.play();
 var tickRate = 50;
 var moveSpeed = 1;// *moveSpeed
 var allObjects = [[],[],[],[]]; // [walls,bullets,enemies,particles]
-
 
 function posit(a) { // returns positive version of a (simply remove the - symbol)
   return(sqrt(a*a));
@@ -57,7 +46,6 @@ Hscore = localStorage.getItem("SGH_score"); // gets highscore from localStorage
 function Onscreen(object, mySize) {
   return(object.xPos-cameraX > mySize*-1 && object.xPos-cameraX < xScreenSize+mySize && object.yPos-cameraY > mySize*-1 && object.yPos-cameraY < yScreenSize + mySize);
 }
-// if (Onscreen(this, 10)) {}
 
 function setTickRate(newTickRate) {
   tickRate = newTickRate;
@@ -87,9 +75,6 @@ function ticksPassed(oldDate) {
   return(1); // in extreme lag situations
 }
 
-// this.oldDate = new Date().getTime();
-// *ticksPassed(this.oldDate)
-
 function soundLoud(thisob) { // returns the loudness of sounds
   this.dx = thisob.xPos - Player.xPos;
   this.dy = thisob.yPos - Player.yPos;
@@ -109,7 +94,6 @@ function create_walls(){
       i -= 1;
     }
     if (amount_of_walls_deleted >= 5) { // if 5 walls where deleted, make a new wall
-//      console.log(amount_of_walls_deleted);
       randint = Math.floor(random(0,359));
       this.newX = Math.sin(randint) * 1000 + Player.xPos; // set new x and y
       this.newY = Math.cos(randint) * 1000 + Player.yPos;
@@ -142,8 +126,6 @@ function distanceTo(object1, object2) {
   return(sqrt((dx*dx)+(dy*dy)));
 }
 
-// distanceTo(this, otherObject)
-
 function wallHitbox(object, mySize, damage, canBeMoved) {
   this.loopvar = 0;
   this.object = object;
@@ -172,21 +154,21 @@ function wallHitbox(object, mySize, damage, canBeMoved) {
   return(hasCollided);
 }
 
-//wallHitbox(this, 10, 0, true);
-
-function wall(X,Y,mySize) {
-  this.xPos = X;
-  this.yPos = Y;
-  this.mySize = mySize;
-  this.health = 5;
-  this.tick = function() {
+class wall {
+  constructor (X,Y,mySize) {
+    this.xPos = X;
+    this.yPos = Y;
+    this.mySize = mySize;
+    this.health = 5;
+  }
+  tick() {
     if (this.health <= 0) {
       a -= 1;
       allObjects[0].splice(allObjects[0].indexOf(this), 1);
     }
   }
   // render
-  this.render = function() {
+  render() {
     if (Onscreen(this, this.mySize)) {
       if (Math.ceil(this.health) >= 5) {
         image(barricade5, this.xPos - (mySize/2) - cameraX, this.yPos - (mySize/2) - cameraY, this.mySize, this.mySize);
@@ -203,50 +185,53 @@ function wall(X,Y,mySize) {
   }
 }
 
-function particle(xp,yp,xs,ys,col,siz) {
-  this.oldDate = new Date().getTime();
-  this.xPos = xp;
-  this.yPos = yp;
-  this.xSpeed = xs;
-  this.ySpeed = ys;
-  this.color = col;
-  this.mySize = siz;
-  this.oldGameTime = new Date().getTime();
-  this.tick = function() {
+class particle {
+  constructor(xp,yp,xs,ys,col,siz) {
+    this.oldDate = new Date().getTime();
+    this.xPos = xp;
+    this.yPos = yp;
+    this.xSpeed = xs;
+    this.ySpeed = ys;
+    this.color = col;
+    this.mySize = siz;
+    this.oldGameTime = new Date().getTime();
+  }
+  tick() {
     this.mySize -= 0.1;
     if (this.mySize <= 0) {
       allObjects[3].splice(allObjects[3].indexOf(this), 1);
       a -= 1;
     }
   }
-  this.render = function() {
+  render() {
     this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
     this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
     this.oldGameTime = new Date().getTime();
     if (Onscreen(this, this.mySize)) {
       fill(this.color);
       ellipse(this.xPos - cameraX,this.yPos - cameraY,this.mySize,this.mySize);
-// ellipse(this.xPos - cameraX - (xScreenSize/2),this.yPos - cameraY - (yScreenSize/2),round(this.mySize),round(this.mySize)); suddenly stopped working?????
     }
   }
 }
 
-function bullet(X,Y,XS,YS,Damage,COL,aType) {
-  this.xPos = X;
-  this.yPos = Y;
-  this.xSpeed = XS;
-  this.ySpeed = YS;
-  this.Dam = Damage;
-  this.color = COL;
-  this.type = aType
-  this.explosionSound = new Audio('music/Explosion.mp3');
-  this.lazerSound = new Audio('music/LAZER.mp3');
-  this.oldGameTime = new Date().getTime();
-  if (soundLoud(this)) {
-   lazerSound.volume = soundLoud(this); // sets volume variable correct, but sound.play(); does not react to the volume?
-   this.lazerSound.play();
+class bullet {
+  constructor(X,Y,XS,YS,Damage,COL,aType) {
+    this.xPos = X;
+    this.yPos = Y;
+    this.xSpeed = XS;
+    this.ySpeed = YS;
+    this.Dam = Damage;
+    this.color = COL;
+    this.type = aType
+    this.explosionSound = new Audio('music/Explosion.mp3');
+    this.lazerSound = new Audio('music/LAZER.mp3');
+    this.oldGameTime = new Date().getTime();
+    if (soundLoud(this)) {
+      lazerSound.volume = soundLoud(this); // sets volume variable correct, but sound.play(); does not react to the volume?
+      this.lazerSound.play();
+    }
   }
-  this.tick = function() {
+  tick() {
     // hitbox walls
     if (wallHitbox(this, this.Dam*2.5, 1, false)) { // calling wallhitbox also does the nowmal hitbox stuff.
       this.Dam += -5;
@@ -257,7 +242,7 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
     }
   }
   //render
-  this.render = function() {
+  render() {
     // move
     this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
     this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
@@ -269,18 +254,20 @@ function bullet(X,Y,XS,YS,Damage,COL,aType) {
   }
 }
 
-function enemy(X, Y, HP, REL) {
-  this.xPos = X;
-  this.yPos = Y;
-  this.health = HP;
-  this.reload = REL;
-  this.xSpeed = 0;
-  this.ySpeed = 0;
-  this.goalXSpeed = 0;
-  this.goalYSpeed = 0;
-  this.mySize = 60;
-  this.oldGameTime = new Date().getTime();
-  this.tick = function() {
+class enemy {
+  constructor(X, Y, HP, REL) {
+    this.xPos = X;
+    this.yPos = Y;
+    this.health = HP;
+    this.reload = REL;
+    this.xSpeed = 0;
+    this.ySpeed = 0;
+    this.goalXSpeed = 0;
+    this.goalYSpeed = 0;
+    this.mySize = 60;
+    this.oldGameTime = new Date().getTime();
+  }
+  tick() {
     this.goalXSpeed = 0;
     this.goalYSpeed = 0;
     if (distanceTo(this, Player) > 200) { // if far from player:
@@ -351,7 +338,7 @@ function enemy(X, Y, HP, REL) {
     this.ySpeed = this.ySpeed / 1.2;
     this.reload -= 1;
   }
-  this.render = function() {
+  render() {
     // move
     this.xPos += this.xSpeed*ticksPassed(this.oldGameTime)*moveSpeed;
     this.yPos += this.ySpeed*ticksPassed(this.oldGameTime)*moveSpeed;
@@ -375,7 +362,6 @@ function restart() {
   gameTickCount = 0;
   explosionSound.volume = 1;
   explosionSound.play();
-  // alert("you lost");
   localStorage.setItem("SGH_score", Hscore);
   allObjects[0] = []; // lsit with all wall objects
   allObjects[1] = []; // list with all bullet objects
@@ -392,23 +378,22 @@ function restart() {
   stage = 0;
 }
 
-function player() {
-  this.xPos = 100;
-  this.yPos = 100;
-  this.xSpeed = 0;
-  this.ySpeed = 0;
-  this.rot = 0;
-  this.health = playerMaxHP;
-  this.lastHitTime = 0;
-  this.reload = 0;
-  this.speed = 0.5;
-  this.reloadTime = 50;
-  this.inventorySlotCount = 1;
-  this.inventoryCount = [0];
-  this.inventoryType = [''];
-  this.oldGameTime = new Date().getTime();
+class player {
+  constructor() {
+    this.xPos = 100;
+    this.yPos = 100;
+    this.xSpeed = 0;
+    this.ySpeed = 0;
+    this.rot = 0;
+    this.health = playerMaxHP;
+    this.lastHitTime = 0;
+    this.reload = 0;
+    this.speed = 0.5;
+    this.reloadTime = 50;
+    this.oldGameTime = new Date().getTime();
+  }
   // controls
-  this.controls = function() {
+  controls() {
     this.rot = atan2((mouseX - (xScreenSize / 2)) * -1,(mouseY - (yScreenSize / 2)) * -1) * -1;
     if (keyIsDown(65)) { //a
         this.xSpeed -= this.speed;
@@ -470,7 +455,7 @@ function player() {
   // hitboxing bullets
   // hitboxing enemys
   // render
-  this.render = function() {
+  render() {
     translate(this.xPos - cameraX,this.yPos - cameraY); // rotation
     push(); // rotation
     rotate(this.rot); // rotation
@@ -525,22 +510,6 @@ function Pause() {
   }
 }
 
-function CraftMenu() {
-  textAlign(LEFT);
-  fill(127,255,127);
-  textSize(20);
-  this.textY = 25;
-  for (i = 0; i < Player.inventoryType.length; i++) {
-    text(Player.inventoryType[i] + ':' + Player.inventoryCount[i].toString(),0,this.textY);
-    this.textY -= 30;
-  }
-  textAlign(CENTER);
-  text('Presst SPACE to go back to game',xScreenSize/2,yScreenSize-50);
-  if (keyIsDown(32)) {
-    stage = 0;
-  }
-}
-
 function gameTick() {
   noStroke();
   playerFire();
@@ -581,14 +550,11 @@ function deathAnim() {
   textSize(yScreenSize/5);
   textAlign(CENTER, CENTER);
   text('You Died!',xScreenSize/2,(yScreenSize/2)-(yScreenSize/10));
-  fill(0,0,0,255);
+  fill(0,200,0,255);
   textSize(yScreenSize/10);
   text('Score: ' + score.toString() + ', High score: ' + Hscore.toString(),xScreenSize/2,(yScreenSize/2)+(yScreenSize/10))
   text('press C to continue',xScreenSize/2,(yScreenSize/2)+(yScreenSize/4));
 }
-
-// this.oldGameTime = new Date().getTime();
-// *ticksPassed(this.oldGameTime)
 
 function draw() {
   create_walls(); // wall algorithim
